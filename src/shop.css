@@ -73,7 +73,7 @@
 
 /* ข้อ 1 กระดาษ */
 .sf-papers { display: flex; gap: calc(14 * var(--u)); overflow-x: auto; margin: 0 calc(-24 * var(--u)); padding: calc(6 * var(--u)) calc(24 * var(--u)) calc(4 * var(--u)); scrollbar-width: none; cursor: grab; overscroll-behavior-x: contain; touch-action: pan-x; } .sf-papers.drag { cursor: grabbing; } .sf-papers.drag .sf-paper { pointer-events: none; } .sf-papers::-webkit-scrollbar { display: none; }
-.sf-paper { position: relative; flex: none; width: calc(114 * var(--u)); height: calc(112 * var(--u)); scroll-snap-align: center; }
+.sf-paper { position: relative; flex: none; width: calc(132 * var(--u)); height: calc(124 * var(--u));   /* เห็น 2 แผ่นครึ่ง → รู้ว่าเลื่อนได้ */ scroll-snap-align: center; }
 .pp { position: absolute; inset: 0; background: #FBF7EC; padding: calc(30 * var(--u)) calc(12 * var(--u)) 0; display: flex; flex-direction: column; align-items: center; gap: calc(7 * var(--u)); clip-path: polygon(0 0, 100% 0, 100% 90%, 92% 95%, 84% 90%, 76% 96%, 66% 91%, 56% 97%, 46% 91%, 36% 96%, 26% 90%, 16% 96%, 8% 91%, 0 96%); transition: transform .6s ease, opacity .6s ease; }
 .pp b { color: var(--k); font-size: calc(17 * var(--u)); font-weight: 600; white-space: nowrap; margin-bottom: calc(4 * var(--u)); }
 .pp i { height: calc(4 * var(--u)); border-radius: 2px; background: color-mix(in srgb, var(--k) 30%, #fff); width: 78%; } .pp i:nth-child(3) { width: 56%; align-self: flex-start; margin-left: 11%; } .pp i:nth-child(4) { width: 66%; align-self: flex-start; margin-left: 11%; }

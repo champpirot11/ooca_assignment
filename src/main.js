@@ -43,7 +43,7 @@ function go(n) {
     if (prev) { const pp = pages[prev.page]; pp.el.classList.remove('on'); clearTimeout(leaveTimers[prev.page]); leaveTimers[prev.page] = setTimeout(() => pp.leave(), 750); }
     const np = pages[nxt.page]; clearTimeout(leaveTimers[nxt.page]); np.enter({ stage: nxt.stage }); np.el.classList.add('on');
   } else pages[nxt.page].setStage?.(nxt.stage);
-  cur = n; audio.scene(nxt.page, nxt.stage); screenEl.classList.toggle('last', n === LAST);
+  cur = n; audio.scene(nxt.page, nxt.stage); screenEl.classList.toggle('last', n === LAST); screenEl.classList.toggle('first', n === 0);
   progress.forEach((p, i) => p.classList.toggle('on', i <= n));
   $('progress').setAttribute('aria-valuenow', n + 1);
   copyEls.forEach((c, i) => c.classList.toggle('on', i === n));
@@ -55,14 +55,13 @@ const next = () => { if (cur < LAST && performance.now() >= unlockAt) { audio.ta
 const back = () => { if (cur > 0) { audio.back(); go(cur - 1); } };
 
 // แตะที่ไหนก็ได้บนจอ = ไปต่อ (ยกเว้นปุ่มด้านบนและปุ่ม CTA)
-// ฝั่งซ้าย (1 ใน 3 ของจอ) = ย้อนกลับ · ที่เหลือฝั่งขวา = ไปต่อ
 let heard = false;   // เบราว์เซอร์มือถือไม่ยอมเล่นเสียงจนกว่าจะแตะครั้งแรก → แตะแรกที่ฉาก 1 = เปิดเสียงฝนก่อน ยังไม่เปลี่ยนฉาก
 screenEl.addEventListener('click', (e) => {
   audio.unlock();
   if (!heard) { heard = true; if (cur === 0 && !e.target.closest('.back, .skip, .cta, .sound')) return; }
   if (screenEl.classList.contains('in-shop')) return;
   if (e.target.closest('.back, .skip, .cta, .sound')) return;
-  const r = screenEl.getBoundingClientRect(); (e.clientX - r.left < r.width / 3 ? back : next)();
+  next();   // แตะตรงไหนก็ไปฉากต่อไป (ย้อนกลับใช้ปุ่ม <)
 });
 const sndBtn = $('sound');
 function paintSound() { sndBtn.setAttribute('aria-pressed', String(!audio.muted)); sndBtn.setAttribute('aria-label', audio.muted ? 'เปิดเสียง' : 'ปิดเสียง'); sndBtn.classList.toggle('off', audio.muted); }

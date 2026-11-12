@@ -129,7 +129,9 @@ export function createShopFlow({ onExit } = {}) {
     if (btn !== null) setBtn(btn);
   }
   function setBtn(label, ok = true) { const b = dyn.querySelector('#sfgo'); if (!b) return; b.innerHTML = label ? esc(label) : DOTS; b.disabled = !label || !ok; b.classList.toggle('ready', !!label && ok); }
-  const press = () => new Promise((res) => { const my = run, h = (e) => { const b = e.target.closest('#sfgo:not(:disabled), #sfskip, [data-r]'); if (!b || my !== run) return; dyn.removeEventListener('click', h); audio.fx(b.id === 'sfskip' || b.dataset.r === 'back' ? 'type' : 'soft'); res(b.id === 'sfgo' ? 'go' : b.id === 'sfskip' ? 'skip' : b.dataset.r); }; dyn.addEventListener('click', h); });
+  const press = () => new Promise((res) => { const my = run, h = (e) => { const b = e.target.closest('#sfgo:not(:disabled), #sfskip, [data-r]'); if (!b || my !== run) return; dyn.removeEventListener('click', h);
+      if (b.id === 'sfgo') { b.innerHTML = DOTS; b.disabled = true; b.classList.remove('ready'); }   // กดแล้วเป็นปุ่มโหลดทันที รู้ว่ากดไปแล้ว
+      audio.fx(b.id === 'sfskip' || b.dataset.r === 'back' ? 'type' : 'soft'); res(b.id === 'sfgo' ? 'go' : b.id === 'sfskip' ? 'skip' : b.dataset.r); }; dyn.addEventListener('click', h); });
   const toScreen = (wx, wy) => [ox + wx * S, oy + wy * S];
 
   /* ---------- ลำดับเรื่อง ---------- */

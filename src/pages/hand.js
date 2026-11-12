@@ -12,16 +12,16 @@ const smooth = (x) => { x = Math.min(1, Math.max(0, x)); return .5 - .5 * Math.c
 export function createHandPage() {
   const el = document.createElement('section');
   el.className = 'page'; el.setAttribute('aria-label', 'หน้า 2');
-  el.innerHTML = `<div class="art">${bg}</div><canvas class="layer fadeTop"></canvas><div class="shade"></div>`;
+  el.innerHTML = `<div class="art">${bg}</div><canvas class="layer"></canvas><div class="shade"></div>`;
   const canvas = el.querySelector('canvas');
-  let renderer, scene, camera, handPivot, running = false, time = 0, built = false;
+  let rainMat = null, renderer, scene, camera, handPivot, running = false, time = 0, built = false;
   const PALM = new THREE.Vector3(0, .18, .35), HAND_BASE_Y = -.9;
   let rainGeo, RAIN_COUNT = 360, rainSpeeds, ripples = [], splashes = [], ripIdx = 0, spIdx = 0;
   const MAX_RIPPLES = 40, MAX_SPLASH = 60;
 
   function build() {
     if (built) return; built = true;
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: (devicePixelRatio || 1) < 2, alpha: true, powerPreference: 'high-performance' });   // จอ retina ไม่ต้อง antialias (คมอยู่แล้ว) ลดงานมือถือ
     renderer.setClearColor(0x000000, 0);
     scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x14262a, .05);
     camera = new THREE.PerspectiveCamera(42, DW / DH, .1, 100); camera.position.set(0, 2.5, 7.2); camera.lookAt(0, .4, 0);
@@ -60,7 +60,11 @@ export function createHandPage() {
       pos.set([x, y, z, x, y - len, z], i * 6); rainSpeeds[i] = (.15 + Math.random() * .2) * 60;     // หน่วย ต่อวินาที
     }
     rainGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    scene.add(new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0x86aaa6, transparent: true, opacity: .55, depthWrite: false })));
+    // ฝนจางลงด้านบนจอ ทำในเชดเดอร์แทน CSS mask (mask บน canvas ทำให้ iPhone ต้องวาดซ้อนใหม่ทุกเฟรม = กระตุก)
+    rainMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uH: { value: 1 } },
+      vertexShader: 'void main(){ gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: 'uniform float uH; void main(){ float t = 1.0 - gl_FragCoord.y / uH; gl_FragColor = vec4(0.525, 0.667, 0.651, 0.55 * smoothstep(0.308, 0.498, t)); }' });
+    scene.add(new THREE.LineSegments(rainGeo, rainMat));
 
     const ringGeo = new THREE.RingGeometry(.015, .045, 32);
     for (let i = 0; i < MAX_RIPPLES; i++) {
@@ -94,7 +98,7 @@ export function createHandPage() {
       const ang = Math.random() * Math.PI * 2, sp = .015 + Math.random() * .03; s.vx = Math.cos(ang) * sp; s.vy = .04 + Math.random() * .06; s.vz = Math.sin(ang) * sp;
     }
   }
-  function resize() { if (!renderer) return; const r = canvas.getBoundingClientRect(); if (!r.width) return; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5)); renderer.setSize(r.width, r.height, false); }
+  function resize() { if (!renderer) return; const r = canvas.getBoundingClientRect(); if (!r.width) return; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5)); renderer.setSize(r.width, r.height, false); if (rainMat) rainMat.uniforms.uH.value = renderer.domElement.height; }
 
   function tick(dt) {
     if (!built || !running) return;
