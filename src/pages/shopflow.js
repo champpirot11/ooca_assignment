@@ -224,7 +224,7 @@ export function createShopFlow({ onExit } = {}) {
     for (;;) {
       say(fromNote ? 'ขอบคุณที่บอกผมนะครับ\nผมเป็นห่วงคุณจริงๆ' : 'ไม่ต้องฝืนตัวเองนะครับ');
       swapOut(); dyn.className = 'sf-dyn'; dyn.innerHTML = fromNote
-        ? `<h3 class="sf-h">คุณไม่ต้องแบกเรื่องนี้ไว้คนเดียวนะ</h3><p class="sf-p">สิ่งที่คุณเขียนฟังดูหนักมาก ตอนนี้มีคนที่พร้อมคุยกับคุณอยู่ โทรหรือทักไปได้เลย</p>${helpCard}<button class="sf-skip" data-r="stay">ขอนั่งต่ออีกหน่อย</button>`
+        ? `<h3 class="sf-h">ผมขอเช็กใจคุณหน่อยนะครับ</h3><p class="sf-p">ถ้าตอนนี้ใจหนักมาก หรือมีความคิดอยากทำร้ายตัวเอง คุณไม่ต้องแบกไว้คนเดียว มีคนพร้อมคุยกับคุณอยู่ตอนนี้เลย ถ้าไม่ได้หมายความแบบนั้น ก็นั่งต่อกับผมได้เลยครับ</p>${helpCard}<button class="sf-skip" data-r="stay">ขอนั่งต่ออีกหน่อย</button>`
         : `<h3 class="sf-h">ตอนนี้คุณเหนื่อยมากเลยใช่ไหม</h3><p class="sf-p">ไม่ต้องตอบอะไรเพิ่มก็ได้ ถ้าอยากคุยกับใครสักคนตอนนี้ มีคนพร้อมฟังอยู่นะ</p>${helpCard}<button class="sf-skip" data-r="stay">ขอนั่งต่ออีกหน่อย</button>`;
       await press(); say('ผมอยู่ตรงนี้นะครับ');
       swapOut(); dyn.innerHTML = `<h3 class="sf-h">เล่นต่อได้เลยไม่ต้องรีบ</h3><p class="sf-p">ผมจะพาไปทีละข้อ ข้ามข้อไหนก็ได้ และเลือกแผ่นเสียงที่เบาและอ่อนโยนให้</p><button class="sf-btn ready" data-r="go">ไปต่อ</button><button class="sf-btn ghost" data-r="talk">ขอคุยกับใครสักคนก่อน</button>`;
