@@ -9,6 +9,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* 1 หน่วย --u = 1px ของดีไซน์ Figma (390×844) — ทุกขนาดคำนวณจากหน่วยนี้ จอใหญ่ขึ้นก็ย่อ/ขยายตามสัดส่วน */
 .screen { position: relative; overflow: hidden; background: var(--ink); width: min(100vw, calc(100vh * 390 / 844)); aspect-ratio: 390 / 844; --u: calc(min(100vw, 100vh * 390 / 844) / 390); }
+/* ใช้ความสูงที่มองเห็นจริง (dvh) — Safari/Chrome บนมือถือ 100vh จะรวมพื้นที่ใต้แถบ URL ทำให้ขอบบน/ล่างโดนตัด */
+@supports (height: 100dvh) {
+  html, body { height: 100dvh; }
+  .screen { width: min(100vw, calc(100dvh * 390 / 844)); --u: calc(min(100vw, 100dvh * 390 / 844) / 390); }
+}
+/* มือถือ: เต็มจอทั้งกว้างและสูง ไม่มีแถบดำข้างๆ (iPad/เดสก์ท็อปค่อยออกแบบแยก) */
+@media (max-width: 600px) {
+  .screen { width: 100vw; height: 100vh; height: 100dvh; aspect-ratio: auto; --u: calc(100vw / 390); }
+}
 .stack, .page { position: absolute; inset: 0; }
 .page { opacity: 0; pointer-events: none; transition: opacity .7s ease; }
 .page.on { opacity: 1; }
@@ -54,11 +63,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .copy.sm { font-size: calc(19.7 * var(--u)); }          /* หน้า 2 มี 3 บรรทัด ตัวเล็กลงตามดีไซน์ */
 .copy em { font-style: normal; color: var(--teal); }
 
-.hint { position: absolute; z-index: 5; left: 0; right: 0; top: calc(763 * var(--u)); text-align: center; font-size: calc(15.5 * var(--u)); line-height: calc(22 * var(--u)); color: rgba(255, 255, 255, .5); opacity: 0; transition: opacity .5s ease; pointer-events: none; }
+.hint { position: absolute; z-index: 5; left: 0; right: 0; bottom: calc(59 * var(--u) + env(safe-area-inset-bottom, 0px)); text-align: center; font-size: calc(15.5 * var(--u)); line-height: calc(22 * var(--u)); color: rgba(255, 255, 255, .5); opacity: 0; transition: opacity .5s ease; pointer-events: none; }
 .hint.on { opacity: 1; animation: breathe 2.6s ease-in-out infinite; }
 @keyframes breathe { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
 
-.cta { position: absolute; z-index: 7; left: calc(24 * var(--u)); right: calc(24 * var(--u)); top: calc(736 * var(--u)); height: calc(52 * var(--u)); border-radius: calc(26 * var(--u)); background: #2FCFC0; color: #fff; font-weight: 600; font-size: calc(16 * var(--u)); box-shadow: 0 calc(3 * var(--u)) calc(6 * var(--u)) rgba(0, 0, 0, .1); opacity: 0; transform: translateY(calc(10 * var(--u))); pointer-events: none; transition: opacity .6s ease, transform .6s ease, filter .2s; }
+.cta { position: absolute; z-index: 7; left: calc(24 * var(--u)); right: calc(24 * var(--u)); bottom: calc(56 * var(--u) + env(safe-area-inset-bottom, 0px)); height: calc(52 * var(--u)); border-radius: calc(26 * var(--u)); background: #2FCFC0; color: #fff; font-weight: 600; font-size: calc(16 * var(--u)); box-shadow: 0 calc(3 * var(--u)) calc(6 * var(--u)) rgba(0, 0, 0, .1); opacity: 0; transform: translateY(calc(10 * var(--u))); pointer-events: none; transition: opacity .6s ease, transform .6s ease, filter .2s; }
 .cta.on { opacity: 1; transform: none; pointer-events: auto; }
 .cta:active { filter: brightness(.92); transform: scale(.99); }
 

@@ -62,7 +62,7 @@ export function createShopFlow({ onExit } = {}) {
     el.style.setProperty('--kb', kb + 'px'); placeBubble(dur);
   }
   function placeBubble(dur = 0) {
-    const u = U(), [w, r, , ay] = POSE[m.pose], top = oy + (m.y - w * r * ay) * S, sx = ox + m.x * S, bw = bubble.offsetWidth, bh = bubble.offsetHeight;
+    const u = U(), [w, r, , ay] = POSE[m.pose], top = oy + (m.y - w * r * ay) * S, sx = ox + (m.pose === 'sit' ? 122 : m.x) * S, bw = bubble.offsetWidth, bh = bubble.offsetHeight;
     const left = clamp(sx - bw * .4, 12 * u, el.clientWidth - bw - 12 * u), y = Math.max(56 * u, top - bh - 6 * u);
     bubble.style.transitionDuration = (REDUCE ? 0 : dur) + 'ms'; bubble.style.transform = `translate(${left}px,${y}px)`; bubble.style.setProperty('--tail', clamp(sx - left, 26 * u, bw - 26 * u) + 'px');
   }

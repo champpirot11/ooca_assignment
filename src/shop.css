@@ -140,3 +140,12 @@
 .screen.in-shop .topbar, .screen.in-shop .progress, .screen.in-shop .copies, .screen.in-shop .hint, .screen.in-shop .cta { display: none; }
 @media (prefers-reduced-motion: reduce) { .sf-body, .sf-rain, .sf-tt .rec, .sf-opt .v { animation: none !important; } .sf-world, .sf-bubble, .sf-sheet { transition-duration: .01s !important; } }
 .sf [hidden] { display: none !important; }
+
+/* จอเตี้ย (มือถือที่มีแถบ URL) — ย่อเครื่องเล่น/ใบเสร็จ ให้ยังเห็นฉาก ปุ่มด้านบน และปุ่มล่างครบ */
+@media (max-height: 780px) {
+  .sf-tt { width: 76%; margin: 0 auto; } .sf-top.small .sf-tt { width: 64%; }
+  .sf-rcw.open { height: min(calc(430 * var(--u)), calc(100vh - 300 * var(--u))); height: min(calc(430 * var(--u)), calc(100dvh - 300 * var(--u))); }
+}
+@media (max-height: 640px) {
+  .sf-tt { width: 60%; } .sf-top.small .sf-tt { width: 50%; }
+}
