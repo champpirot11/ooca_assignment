@@ -19,19 +19,20 @@
 .sf-body > * { position: absolute; opacity: 0; transition: opacity 1.2s ease; transform: scaleX(var(--flip, 1)); transform-origin: 50% 50%; pointer-events: none; }
 .sf-body > .on { opacity: 1; }
 .sf-masc:has(.sit) .sf-shadow { opacity: 0; }
+.sf-sit { position: absolute; left: 20px; top: 258px; width: 220px; max-width: none !important; opacity: 0; transition: opacity 1.2s ease; pointer-events: none; z-index: 1; } .sf-sit.on { opacity: 1; }
 .sf-body.sit, .sf-body.sit.speak { animation: none; }   /* ฉากแรกใช้ภาพจากดีไซน์ตรงๆ ไม่ขยับ */
 .sf-ghost { position: absolute; pointer-events: none; animation: dynout .45s ease forwards; }
 @keyframes dynout { to { opacity: 0; transform: translateY(-4px); } }
 .sf-body .svgp svg { display: block; width: 100%; height: auto; overflow: visible; }
 .sf-body .leg { transform-box: fill-box; transform-origin: 50% 8%; }
-.sf-body.walking .leg1 { animation: leg .96s ease-in-out infinite; } .sf-body.walking .leg2 { animation: leg .96s ease-in-out infinite -.48s; }
-@keyframes leg { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(16deg); } }
-.sf-body.speak { animation: mtalk2 .6s ease-in-out infinite; }
-.sf-body.walking { animation: mwalk .96s ease-in-out infinite; }
+.sf-body.walking .leg1 { animation: leg 1.4s ease-in-out infinite; } .sf-body.walking .leg2 { animation: leg 1.4s ease-in-out infinite -.7s; }
+@keyframes leg { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
+.sf-body.speak { animation: mtalk2 1.4s ease-in-out infinite; }
+.sf-body.walking { animation: mwalk 1.4s ease-in-out infinite; }
 .sf-masc.hop { animation: mhop .85s cubic-bezier(.35, 1.25, .5, 1); }
 @keyframes mbreath { 50% { transform: scale(1.012, .988); } }
-@keyframes mtalk2 { 50% { transform: translateY(-3px) scale(.994, 1.012); } }
-@keyframes mwalk { 0%, 100% { transform: translateY(0) rotate(-2deg); } 25% { transform: translateY(-7px) rotate(0); } 50% { transform: translateY(0) rotate(2deg); } 75% { transform: translateY(-7px) rotate(0); } }
+@keyframes mtalk2 { 50% { transform: translateY(-1.5px) scale(.997, 1.006); } }
+@keyframes mwalk { 0%, 100% { transform: translateY(0) rotate(-1deg); } 25% { transform: translateY(-3px) rotate(0); } 50% { transform: translateY(0) rotate(1deg); } 75% { transform: translateY(-3px) rotate(0); } }
 @keyframes mhop { 0% { transform: scale(1, 1); } 30% { transform: translateY(-11px) scale(.98, 1.03); } 60% { transform: translateY(0) scale(1.04, .96); } 100% { transform: none; } }
 
 /* ฝน/แสง */
@@ -143,9 +144,12 @@
 
 /* จอเตี้ย (มือถือที่มีแถบ URL) — ย่อเครื่องเล่น/ใบเสร็จ ให้ยังเห็นฉาก ปุ่มด้านบน และปุ่มล่างครบ */
 @media (max-height: 780px) {
-  .sf-tt { width: 76%; margin: 0 auto; } .sf-top.small .sf-tt { width: 64%; }
+  .sf-tt { width: 62%; margin: 0 auto; } .sf-top.small .sf-tt { width: 52%; }
   .sf-rcw.open { height: min(calc(430 * var(--u)), calc(100vh - 300 * var(--u))); height: min(calc(430 * var(--u)), calc(100dvh - 300 * var(--u))); }
 }
 @media (max-height: 640px) {
-  .sf-tt { width: 60%; } .sf-top.small .sf-tt { width: 50%; }
+  .sf-tt { width: 50%; } .sf-top.small .sf-tt { width: 42%; }
 }
+
+/* บับเบิ้ลข้างตัว (จอเตี้ย/กล่องขาวสูง): หางชี้ไปทางซ้ายหาตัว */
+.sf-bubble.side::after { left: calc(-10 * var(--u)); top: calc(22 * var(--u)); border: calc(9 * var(--u)) solid transparent; border-right: calc(12 * var(--u)) solid #fff; border-left: 0; }

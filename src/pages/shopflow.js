@@ -18,11 +18,12 @@ const WALK = walkSvg.replace(/<svg[^>]*>/, (t) => t.replace(/ width="[^"]*"| hei
 const POSE_URL = import.meta.glob('../art/shop/m-*.webp', { eager: true, query: '?url', import: 'default' });
 // ท่า: [กว้างในฉาก, สัดส่วนสูง/กว้างของไฟล์, จุดยืน x (0..1), จุดยืน y (0..1)]
 // จุดยืน y = ตำแหน่งเท้าในไฟล์ (วัดจากภาพจริง) เพื่อให้เท้าแตะพื้นพอดี ไม่ลอย/ไม่จม
+// ขนาด/จุดกึ่งกลาง ปรับให้หัวมาสคอตกว้างเท่ากันทุกท่า (วัดจากภาพ) และกึ่งกลางหัวอยู่จุดเดียวกัน → ตอนเฟดเปลี่ยนท่าตัวซ้อนกันพอดี ไม่เลื่อน
+// [ความกว้างในฉาก, สัดส่วน สูง/กว้าง, จุดกึ่งกลางแนวนอน (0–1), ระดับเท้า (0–1)]
 const POSE = {
-  // sit = ภาพฉากแรกจากดีไซน์ (Intro1) ตัดเฉพาะตัวมาสคอต วางตรงตำแหน่งเดิมในฉาก
-  sit: [220, 152 / 220, 0, 0], stand: [286, 234 / 263, .49, .99], care: [286, 234 / 263, .49, .99], wave: [230, 199 / 200, .5, .99],
-  towel: [240, 199 / 200, .46, .99], find: [236, 230 / 200, .45, .98], found1: [236, 220 / 200, .51, .975], found2: [236, 239 / 200, .51, .9],
-  listen: [240, 234 / 200, .49, .978], umbrella: [400, 354 / 378, .67, .99], confuse: [230, 210 / 200, .52, .98], walk: [236, 223 / 200, .51, .975],
+  sit: [220, 152 / 220, 0, 0], stand: [286, 234 / 263, .497, .99], care: [286, 234 / 263, .497, .99], wave: [239, 199 / 200, .51, .99],
+  towel: [236, 199 / 200, .491, .99], find: [238, 230 / 200, .506, .98], found1: [218, 220 / 200, .502, .975], found2: [220, 239 / 200, .49, .9],
+  listen: [244, 234 / 200, .536, .978], umbrella: [400, 354 / 378, .67, .99], confuse: [236, 210 / 200, .52, .98], walk: [218, 223 / 200, .502, .975],
 };
 // ความกว้างช่วงเท้าของแต่ละท่า (วัดจากภาพ) ใช้กำหนดขนาดเงาให้เท่ากันทุกท่า
 const FEET = { stand: .25, care: .25, wave: .32, towel: .3, find: .3, found1: .33, found2: .33, listen: .33, umbrella: .2, confuse: .27, walk: .34 };
@@ -39,31 +40,38 @@ export function createShopFlow({ onExit } = {}) {
     <div class="sf-view"><div class="sf-world" id="world">
       <img class="sf-scene" src="${sceneUrl}" alt="" draggable="false">
       <div class="sf-desk" id="desk"></div><div class="sf-notes" id="notes"></div>
-      <div class="sf-masc" id="masc"><i class="sf-shadow"></i><div class="sf-body" id="body">${Object.keys(POSE).map((k) => k === 'walk' ? `<div class="svgp" data-p="walk">${WALK}</div>` : `<img data-p="${k}" src="${POSE_URL[`../art/shop/m-${k}.webp`]}" alt="" draggable="false">`).join('')}</div></div>
+      <img class="sf-sit" id="sitimg" src="${POSE_URL['../art/shop/m-sit.webp']}" alt="" draggable="false">
+      <div class="sf-masc" id="masc"><i class="sf-shadow"></i><div class="sf-body" id="body">${Object.keys(POSE).filter((k) => k !== 'sit').map((k) => k === 'walk' ? `<div class="svgp" data-p="walk">${WALK}</div>` : `<img data-p="${k}" src="${POSE_URL[`../art/shop/m-${k}.webp`]}" alt="" draggable="false">`).join('')}</div></div>
     </div><canvas class="sf-rainc" id="rainc"></canvas><div class="sf-dim" id="dim"></div></div>
     <button class="sf-help" id="help">อยากคุยกับใครสักคน</button>
     <div class="sf-bubble" id="bubble" aria-live="polite"><b>ooca:</b><p id="btext"></p></div>
     <div class="sf-sheet" id="sheet"><div class="sf-in" id="sin"><div class="sf-top" id="top"></div><div class="sf-embed" id="embed" hidden></div><div class="sf-dyn" id="dyn"></div></div></div>
     <div class="sf-modal" id="modal" hidden></div>`;
   const $ = (s) => el.querySelector(s);
-  const world = $('#world'), masc = $('#masc'), shadow = el.querySelector('.sf-shadow'), body = $('#body'), bubble = $('#bubble'), btext = $('#btext'), sheet = $('#sheet'), sin = $('#sin'), dyn = $('#dyn'), embed = $('#embed'), top = $('#top'), modal = $('#modal');
+  const world = $('#world'), sitImg = $('#sitimg'), masc = $('#masc'), shadow = el.querySelector('.sf-shadow'), body = $('#body'), bubble = $('#bubble'), btext = $('#btext'), sheet = $('#sheet'), sin = $('#sin'), dyn = $('#dyn'), embed = $('#embed'), top = $('#top'), modal = $('#modal');
   const st = { topics: [], rain: null, battery: null, songs: [], note: '', heavy: false, mood: null };
   let alive = false, run = 0, kb = 0;
   const U = () => el.clientWidth / 390;
 
   /* ---------- กล้อง + มาสคอต ---------- */
-  const m = { x: 120, y: 418, pose: 'sit', flip: 1 }; const cam = { boost: 1, dx: 0, fy: 0, dur: 1500 }; let S = 1, ox = 0, oy = 0;   // ทุกอย่างช้าๆ นุ่มๆ
+  const m = { x: 120, y: 418, pose: 'sit', flip: 1 }; const cam = { boost: 1, dx: 0, fy: 0, dur: 1500 }; let S = 1, ox = 0, oy = 0, side = false;   // ทุกอย่างช้าๆ นุ่มๆ
   function layout(dur = cam.dur) {
     const u = U(), W = el.clientWidth, H = el.clientHeight, sh = sin.offsetHeight; sheet.style.height = sh + 'px';
     const sceneH = Math.max(120 * u, H - sh - kb + 20 * u);
-    const z = clamp((.25 + sceneH / u / 950) * cam.boost, .46, 1.3); S = z * u;
-    ox = clamp(W / 2 - (m.x + cam.dx) * S, W - 1610 * S, 0); oy = Math.min(.93 * sceneH - (cam.fy || m.y) * S, 0);
+    // กล่องขาวสูง → ซูมฉากออกให้ตัว + บับเบิ้ลยังพอดีในพื้นที่ที่เหลือ (บับเบิ้ลไม่บังตัว)
+    // ถ้าที่เหลือเตี้ยจนวางบับเบิ้ลเหนือหัวไม่ได้ → โหมดข้าง: ตัวชิดซ้าย บับเบิ้ลอยู่ข้างตัว
+    const zTop = (sceneH / u - 150) / 250; side = zTop < .45;
+    const z = clamp(Math.min((.25 + sceneH / u / 950) * cam.boost, side ? (sceneH / u - 64) / 250 : zTop), .28, 1.3); S = z * u;
+    ox = clamp(W * (side ? .26 : .5) - (m.x + (side ? 0 : cam.dx)) * S, W - 1610 * S, 0); oy = Math.min(.93 * sceneH - (cam.fy || m.y) * S, 0);
     world.style.transitionDuration = (REDUCE ? 0 : dur) + 'ms'; world.style.transform = `translate(${ox}px,${oy}px) scale(${S})`;
     el.style.setProperty('--kb', kb + 'px'); placeBubble(dur);
   }
   function placeBubble(dur = 0) {
-    const u = U(), [w, r, , ay] = POSE[m.pose], top = oy + (m.y - w * r * ay) * S, sx = ox + (m.pose === 'sit' ? 122 : m.x) * S, bw = bubble.offsetWidth, bh = bubble.offsetHeight;
-    const left = clamp(sx - bw * .4, 12 * u, el.clientWidth - bw - 12 * u), y = Math.max(56 * u, top - bh - 6 * u);
+    const u = U(), W = el.clientWidth, [w, r, , ay] = POSE[m.pose], top = oy + (m.y - w * r * ay) * S, sx = ox + (m.pose === 'sit' ? 122 : m.x) * S;
+    bubble.classList.toggle('side', side); bubble.style.maxWidth = side ? Math.max(150 * u, W - (sx + 112 * S) - 22 * u) + 'px' : '';
+    const bw = bubble.offsetWidth, bh = bubble.offsetHeight; let left, y;
+    if (side) { left = Math.min(sx + 112 * S + 10 * u, W - bw - 12 * u); y = Math.max(60 * u, top + 30 * S); }
+    else { left = clamp(sx - bw * .4, 12 * u, W - bw - 12 * u); y = Math.max(56 * u, top - bh - 6 * u); }
     bubble.style.transitionDuration = (REDUCE ? 0 : dur) + 'ms'; bubble.style.transform = `translate(${left}px,${y}px)`; bubble.style.setProperty('--tail', clamp(sx - left, 26 * u, bw - 26 * u) + 'px');
   }
   new ResizeObserver(() => alive && layout(1100)).observe(sin); addEventListener('resize', () => alive && layout(0));
@@ -73,17 +81,17 @@ export function createShopFlow({ onExit } = {}) {
     m.pose = p; m.flip = flip; body.style.setProperty('--flip', flip);
     body.querySelectorAll('[data-p]').forEach((im) => { const on = im.dataset.p === p; im.classList.toggle('on', on); if (on) {
       const [w, r, ax, ay] = POSE[p], h = w * r, clip = 0;
-      im.style.cssText = `width:${w}px;left:${-w * (flip < 0 ? 1 - ax : ax)}px;top:${-h * ay}px;${clip ? `clip-path:inset(0 0 ${clip}px 0)` : ''}`; }
-      else if (im.dataset.p === 'sit') { im.style.left = (20 - m.x) + 'px'; im.style.top = (258 - m.y) + 'px'; } });   // ภาพนั่งค่อยๆ จางอยู่ที่เดิมในฉาก ไม่ตามตัวไป
+      im.style.cssText = `width:${w}px;left:${-w * (flip < 0 ? 1 - ax : ax)}px;top:${-h * ay}px;${clip ? `clip-path:inset(0 0 ${clip}px 0)` : ''}`; }});
+    sitImg.classList.toggle('on', p === 'sit');   // ภาพนั่งหลังเคาน์เตอร์อยู่กับที่ในฉาก แค่เฟดเข้า/ออก
     body.classList.toggle('sit', p === 'sit'); placeBubble(500);
     const sw = POSE[p][0] * (FEET[p] || .3) * 1.35; Object.assign(shadow.style, { width: sw + 'px', height: sw * .2 + 'px', left: -sw / 2 + 'px', top: -sw * .1 + 'px' });
   }
-  const hop = () => { masc.classList.remove('hop'); void masc.offsetWidth; masc.classList.add('hop'); };
+  const hop = () => {};   // ไม่กระโดดแล้ว เปลี่ยนท่าด้วยการเฟดอย่างเดียว ให้นิ่งและสบายตา
   async function walkTo(x, y, endPose = 'stand') {
     const d = Math.hypot(x - m.x, y - m.y); if (d < 8) { pose(endPose, 1); return; }
-    const dur = REDUCE ? 50 : clamp(d * 7, 1700, 4200), my = run; say.hide();
+    const dur = REDUCE ? 50 : clamp(d * 11, 2600, 6200), my = run; say.hide();
     pose('walk', x < m.x ? -1 : 1); body.classList.add('walking'); m.x = x; m.y = y; placeMasc(dur); layout(dur);
-    const steps = setInterval(() => audio.fx('foot'), 480); await wait(dur); clearInterval(steps);
+    const steps = setInterval(() => audio.fx('foot'), 700); await wait(dur); clearInterval(steps);
     body.classList.remove('walking'); if (my === run) pose(endPose, 1);
   }
 

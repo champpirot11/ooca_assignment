@@ -17,7 +17,7 @@ export const WALK = {
   lightDelay: .2,     // หลังแตะ ก่อนแสงเริ่มเข้า
   lightIn: 4.5,       // แสงใช้เวลาเข้า
   lightOut: 2.2,      // แสงใช้เวลาจางออก (ตอนกดย้อนกลับ)
-  settle: 2.2,        // เวลาเฟดจากท่าเดินไปท่ายืนนิ่ง (วินาที) หลังแตะ
+  settle: 1.6,        // เวลาเฟดจากท่าเดินไปท่ายืนนิ่ง (วินาที) หลังแตะ
   reflection: .16,    // เงาสะท้อนบนพื้นเปียก
   rain: { count: 90, strength: .5 },
   // เกรเดียนต์มืดที่นายวางทับขา: stop เปลี่ยนจากหน้า 3 → หน้า 4 ตามดีไซน์
@@ -95,16 +95,17 @@ export function createWalkPage() {
     const next = (idx + 1) % 8, a = F > 0 ? sm((u - (P - F)) / F) : (u >= P - F ? 1 : 0);
     const sa = sm(settle);               // ท่ายืนนิ่งค่อยๆ ซ้อนทับ
     const key = `${idx}|${a > 0 ? next : -1}|${sa > 0 ? 1 : 0}|${sa >= 1 ? 1 : 0}`;
-    if (sa <= 0) place9(0);
+    place9(1);   // ท่ายืนอยู่ตำแหน่งในดีไซน์หน้า 4 ตลอด ไม่เลื่อน/ไม่ย่อ — แค่เฟดเข้า
     if (key !== lastKey) {
       lastKey = key;
       FR.forEach((g, i) => g.setAttribute('display', (sa >= 1 ? i === 8 : (i === idx || (a > 0 && i === next) || (sa > 0 && i === 8))) ? 'inline' : 'none'));
-      FR[idx].setAttribute('opacity', 1);
       if (a > 0) legs.appendChild(FR[next]);                                       // ท่าถัดไปวางทับท่าปัจจุบันแล้วเฟดเข้า
       if (sa > 0) legs.appendChild(FR[8]);
     }
-    if (a > 0) FR[next].setAttribute('opacity', a.toFixed(3));
-    if (sa > 0) { FR[8].setAttribute('opacity', sa.toFixed(3)); place9(sa); }
+    // แตะแล้ว: ท่าเดิน (ท่าไหนก็ตาม) ค่อยๆ จางออก พร้อมท่ายืนจางเข้า
+    FR[idx].setAttribute('opacity', (1 - sa).toFixed(3));
+    if (a > 0) FR[next].setAttribute('opacity', (a * (1 - sa)).toFixed(3));
+    if (sa > 0) FR[8].setAttribute('opacity', sa.toFixed(3));
     if (u >= P - F && trig !== step) { trig = step; if (next % 4 === 0) audio.step(next === 0 ? -1 : 1); }   // ท่า 1 และ 5 = เท้าแตะพื้น
   }
   function setGround() {
