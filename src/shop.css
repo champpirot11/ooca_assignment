@@ -116,7 +116,9 @@
 /* อยากคุยกับใครสักคน + การ์ดช่วยเหลือ */
 .sf-help { position: absolute; z-index: 6; left: calc(14 * var(--u)); top: calc(25 * var(--u)); height: calc(30 * var(--u)); display: flex; align-items: center; font-size: calc(12 * var(--u)); font-weight: 400; color: #5a4a3a; background: rgba(255, 255, 255, .72); border-radius: 99px; padding: 0 calc(12 * var(--u)); backdrop-filter: blur(4px); }
 .sf-care { background: #FFF1EE; border-radius: calc(20 * var(--u)); padding: calc(12 * var(--u)); display: flex; flex-direction: column; gap: calc(10 * var(--u)); } .sf-care p { text-align: center; color: #B98478; font-size: calc(14 * var(--u)); padding-bottom: calc(4 * var(--u)); } .sf-care .sf-btn { font-size: calc(15 * var(--u)); }
-.sf-modal { position: absolute; inset: 0; z-index: 40; background: rgba(30, 30, 45, .55); display: grid; place-items: center; padding: calc(22 * var(--u)); animation: fadein .25s; }
+.sf-modal { position: absolute; inset: 0; z-index: 40; background: rgba(30, 30, 45, .55); display: grid; place-items: center; padding: calc(22 * var(--u)); opacity: 0; transition: opacity .38s ease; }
+.sf-modal > * { transform: translateY(calc(18 * var(--u))) scale(.92); opacity: 0; transition: transform .38s ease, opacity .3s ease; }
+.sf-modal.show { opacity: 1; } .sf-modal.show > * { transform: none; opacity: 1; transition: transform .6s cubic-bezier(.3, 1.4, .5, 1) .05s, opacity .35s ease .05s; }
 .sf-saved { width: 100%; max-height: 100%; overflow: auto; background: #fff; border-radius: calc(24 * var(--u)); padding: calc(18 * var(--u)); display: flex; flex-direction: column; gap: calc(12 * var(--u)); } .sf-saved img { width: 100%; border-radius: 6px; box-shadow: 0 4px 16px rgba(0, 0, 0, .15); user-select: auto; -webkit-user-select: auto; -webkit-touch-callout: default; } .sf-saved > p { text-align: center; font-size: calc(13 * var(--u)); color: #6b6b6b; line-height: 1.5; }
 
 /* เครื่องเล่น */

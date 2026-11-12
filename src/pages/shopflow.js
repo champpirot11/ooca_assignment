@@ -308,7 +308,7 @@ export function createShopFlow({ onExit } = {}) {
     await wait(60); rcw.classList.add('open'); await wait(1300);
     const prt = setInterval(() => audio.fx('print'), 820); audio.fx('print'); rp.classList.add('out'); await wait(4200); clearInterval(prt);
     audio.fx('soft'); hop(); rcw.classList.add('done'); dyn.querySelector('#after').classList.add('on');
-    for (;;) { const r = await press(); if (r === 'done') break; if (r === 'save') { const url = await saveReceipt(data).catch(() => null); if (url) { modal.hidden = false; modal.innerHTML = `<div class="sf-saved"><img src="${url}" alt="ใบเสร็จของคุณ"><p>กดค้างที่รูปเพื่อบันทึก หรือกดดาวน์โหลด<br>รูปนี้อยู่ในเครื่องของคุณเท่านั้น</p><a class="sf-btn ready" href="${url}" download="ooca-receipt.png">ดาวน์โหลด</a><button class="sf-btn ghost" data-x>ปิด</button></div>`; } } }
+    for (;;) { const r = await press(); if (r === 'done') break; if (r === 'save') { const url = await saveReceipt(data).catch(() => null); if (url) { openModal(`<div class="sf-saved"><img src="${url}" alt="ใบเสร็จของคุณ"><p>กดค้างที่รูปเพื่อบันทึก หรือกดดาวน์โหลด<br>รูปนี้อยู่ในเครื่องของคุณเท่านั้น</p><a class="sf-btn ready" href="${url}" download="ooca-receipt.png">ดาวน์โหลด</a><button class="sf-btn ghost" data-x>ปิด</button></div>`); } } }
   }
 
   async function bye() {
@@ -318,8 +318,12 @@ export function createShopFlow({ onExit } = {}) {
     Object.assign(st, { topics: [], rain: null, battery: null, songs: [], note: '', heavy: false, mood: null }); onExit?.();
   }
 
-  modal.addEventListener('click', (e) => { if (e.target === modal || e.target.closest('[data-x]')) modal.hidden = true; });
-  $('#help').addEventListener('click', () => { modal.hidden = false; modal.innerHTML = `<div class="sf-saved care"><h3 class="sf-h">มีคนพร้อมฟังคุณอยู่นะ</h3><p class="sf-p">คุยกับใครสักคนตอนนี้ได้เลย หรือจะกลับมานั่งต่อก็ได้</p>${helpCard}<button class="sf-btn ghost" data-x>กลับไปนั่งต่อ</button></div>`; audio.fx('soft'); });
+  // ป๊อปอัปค่อยๆ เด้งขึ้น/หายไป (ไม่วาป)
+  let mT = 0;
+  function openModal(html) { clearTimeout(mT); modal.innerHTML = html; modal.hidden = false; modal.classList.remove('show'); void modal.offsetWidth; modal.classList.add('show'); audio.fx('soft'); }
+  function closeModal() { modal.classList.remove('show'); clearTimeout(mT); mT = setTimeout(() => { modal.hidden = true; }, REDUCE ? 0 : 380); }
+  modal.addEventListener('click', (e) => { if (e.target === modal || e.target.closest('[data-x]')) closeModal(); });
+  $('#help').addEventListener('click', () => { openModal(`<div class="sf-saved care"><h3 class="sf-h">มีคนพร้อมฟังคุณอยู่นะ</h3><p class="sf-p">คุยกับใครสักคนตอนนี้ได้เลย หรือจะกลับมานั่งต่อก็ได้</p>${helpCard}<button class="sf-btn ghost" data-x>กลับไปนั่งต่อ</button></div>`); audio.fx('soft'); });
 
   /* ---------- ฝนแบบเดียวกับบทเกริ่น (Three.js) ใช้ในข้อ 2 ---------- */
   let rainFx = null, rainOn = false, rainLast = 0, rainOffAt = 0;
