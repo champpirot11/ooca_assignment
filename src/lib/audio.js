@@ -48,7 +48,10 @@ function init() {
   [100, 150.4, 200.3].forEach((f, i) => { const o = ctx.createOscillator(); o.type = i ? 'sine' : 'sawtooth'; o.frequency.value = f; const og = ctx.createGain(); og.gain.value = [.5, .25, .18][i]; o.connect(og); og.connect(hf); o.start(); });
   hf.connect(hg); hg.connect(master); bus.hum = hg;
   setInterval(tickBeds, 100);
-  document.addEventListener('visibilitychange', () => { if (!ctx) return; document.hidden ? ctx.suspend() : ctx.resume(); });
+  // กลับเข้าแอปหลังพับจอ: iOS อาจค้างสถานะ interrupted → สั่งเล่นต่อทุกครั้งที่กลับมา/แตะจอ
+  const wake = () => { if (ctx && !document.hidden && ctx.state !== 'running') ctx.resume().catch(() => {}); };
+  document.addEventListener('visibilitychange', () => { if (!ctx) return; document.hidden ? ctx.suspend() : wake(); });
+  ['pageshow', 'focus'].forEach((ev) => addEventListener(ev, wake)); ['touchend', 'pointerdown', 'keydown'].forEach((ev) => addEventListener(ev, wake, { passive: true }));
   return true;
 }
 function tickBeds() {      // ปรับความดังฝนอย่างนุ่มนวล + เม็ดฝนสุ่ม

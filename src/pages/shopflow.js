@@ -70,7 +70,7 @@ export function createShopFlow({ onExit } = {}) {
     const u = U(), W = el.clientWidth, [w, r, , ay] = POSE[m.pose], top = oy + (m.y - w * r * ay) * S, sx = ox + (m.pose === 'sit' ? 122 : m.x) * S;
     bubble.classList.toggle('side', side); bubble.style.maxWidth = side ? Math.max(150 * u, W - (sx + 112 * S) - 22 * u) + 'px' : '';
     const bw = bubble.offsetWidth, bh = bubble.offsetHeight; let left, y;
-    if (side) { left = Math.min(sx + 112 * S + 10 * u, W - bw - 12 * u); y = Math.max(60 * u, top + 30 * S); }
+    if (side) { left = Math.min(sx + 112 * S + 10 * u, W - bw - 12 * u); y = Math.max(56 * u, Math.min(top + 30 * S, el.clientHeight - sin.offsetHeight - kb - bh - 10 * u)); }
     else { left = clamp(sx - bw * .4, 12 * u, W - bw - 12 * u); y = Math.max(56 * u, top - bh - 6 * u); }
     bubble.style.transitionDuration = (REDUCE ? 0 : dur) + 'ms'; bubble.style.transform = `translate(${left}px,${y}px)`; bubble.style.setProperty('--tail', clamp(sx - left, 26 * u, bw - 26 * u) + 'px');
   }
@@ -78,10 +78,10 @@ export function createShopFlow({ onExit } = {}) {
   if (window.visualViewport) visualViewport.addEventListener('resize', () => { kb = Math.max(0, innerHeight - visualViewport.height - visualViewport.offsetTop); if (alive) layout(200); });
   function placeMasc(dur = 0) { masc.style.transitionDuration = dur + 'ms'; masc.style.left = m.x + 'px'; masc.style.top = m.y + 'px'; }
   function pose(p, flip = m.flip) {
-    m.pose = p; m.flip = flip; body.style.setProperty('--flip', flip);
+    m.pose = p; m.flip = flip;   // ทิศหันเก็บไว้ที่แต่ละภาพ → ภาพเก่าที่กำลังจางไม่พลิกกลับ/วาป
     body.querySelectorAll('[data-p]').forEach((im) => { const on = im.dataset.p === p; im.classList.toggle('on', on); if (on) {
       const [w, r, ax, ay] = POSE[p], h = w * r, clip = 0;
-      im.style.cssText = `width:${w}px;left:${-w * (flip < 0 ? 1 - ax : ax)}px;top:${-h * ay}px;${clip ? `clip-path:inset(0 0 ${clip}px 0)` : ''}`; }});
+      im.style.cssText = `--flip:${flip};width:${w}px;left:${-w * (flip < 0 ? 1 - ax : ax)}px;top:${-h * ay}px;${clip ? `clip-path:inset(0 0 ${clip}px 0)` : ''}`; }});
     sitImg.classList.toggle('on', p === 'sit');   // ภาพนั่งหลังเคาน์เตอร์อยู่กับที่ในฉาก แค่เฟดเข้า/ออก
     body.classList.toggle('sit', p === 'sit'); placeBubble(500);
     const sw = POSE[p][0] * (FEET[p] || .3) * 1.35; Object.assign(shadow.style, { width: sw + 'px', height: sw * .2 + 'px', left: -sw / 2 + 'px', top: -sw * .1 + 'px' });
@@ -89,6 +89,7 @@ export function createShopFlow({ onExit } = {}) {
   const hop = () => {};   // ไม่กระโดดแล้ว เปลี่ยนท่าด้วยการเฟดอย่างเดียว ให้นิ่งและสบายตา
   async function walkTo(x, y, endPose = 'stand') {
     const d = Math.hypot(x - m.x, y - m.y); if (d < 8) { pose(endPose, 1); return; }
+    if (m.pose === 'sit') { say.hide(); m.x = x; m.y = y; placeMasc(0); pose(endPose, 1); layout(1800); await wait(1500); return; }   // จากท่านั่ง (กดข้าม) → เฟดไปที่ใหม่ช้าๆ ไม่เดินลงมา
     const dur = REDUCE ? 50 : clamp(d * 11, 2600, 6200), my = run; say.hide();
     pose('walk', x < m.x ? -1 : 1); body.classList.add('walking'); m.x = x; m.y = y; placeMasc(dur); layout(dur);
     const steps = setInterval(() => audio.fx('foot'), 700); await wait(dur); clearInterval(steps);

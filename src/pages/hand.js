@@ -94,7 +94,7 @@ export function createHandPage() {
       const ang = Math.random() * Math.PI * 2, sp = .015 + Math.random() * .03; s.vx = Math.cos(ang) * sp; s.vy = .04 + Math.random() * .06; s.vz = Math.sin(ang) * sp;
     }
   }
-  function resize() { if (!renderer) return; const r = canvas.getBoundingClientRect(); if (!r.width) return; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); renderer.setSize(r.width, r.height, false); }
+  function resize() { if (!renderer) return; const r = canvas.getBoundingClientRect(); if (!r.width) return; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5)); renderer.setSize(r.width, r.height, false); }
 
   function tick(dt) {
     if (!built || !running) return;

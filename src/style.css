@@ -23,6 +23,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .stack { top: auto; height: max(100%, calc(844 * var(--u))); }
 .page { opacity: 0; pointer-events: none; transition: opacity .7s ease; }
 .page.on { opacity: 1; }
+.page.p5 { transition-duration: 1.6s; }   /* ฉาก 4 → 5 เฟดช้าลง */
+.page:not(.on) { visibility: hidden; transition: opacity .7s ease, visibility 0s linear 1.7s; } .page.on { visibility: visible; transition-delay: 0s; }
+.screen.last .skip { opacity: 0; pointer-events: none; }
 .layer, .art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
 .art svg { width: 100%; height: 100%; display: block; }
 .shopimg { object-fit: cover; }
@@ -177,8 +180,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* ===== หน้า 5: ไฟร้านอุ่นๆ ในความมืด ===== */
 .p5 .art::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(14, 26, 31, .82) 0%, rgba(14, 26, 31, .55) 34%, rgba(14, 26, 31, .12) 52%, transparent 62%); }   /* ด้านบนมืดลง ให้ตัวร้านกลืนกับฉาก */
 /* กระจกสว่างตั้งแต่แรก แล้วแสงฟุ้งค่อยๆ เข้มขึ้น (ใช้ opacity อย่างเดียว ลื่นทุกเครื่อง ไม่วาป) */
-.p5 .p5fx { opacity: .5; transition: opacity 3s ease .2s; will-change: opacity; }
-.p5.lit .p5fx { opacity: 1; }
+.p5 .p5fx { opacity: 1; }   /* แสงกระจกเต็มตั้งแต่เข้าฉาก ไม่เปลี่ยนสีกลางทาง */
 .p5 .p5halo, .p5 .p5bloom { animation: p5breathe 5.5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 .p5 .p5signglow { animation: p5breathe 7s ease-in-out infinite reverse; }
 @keyframes p5breathe { 0%, 100% { opacity: .85; } 50% { opacity: 1; } 62% { opacity: .9; } 66% { opacity: 1; } }

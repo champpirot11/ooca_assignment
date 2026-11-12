@@ -5,7 +5,7 @@ export function createRipples(canvas, { max = 60, warm = null } = {}) {
   const ctx = canvas.getContext('2d'); let scale = 1; const list = [];
   function resize() {
     const r = canvas.getBoundingClientRect(); if (!r.width) return;
-    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const dpr = Math.min(devicePixelRatio || 1, 1.5);
     canvas.width = r.width * dpr; canvas.height = r.height * dpr; scale = r.width / DW * dpr;
   }
   function add(x, y, size, rings, peak) {

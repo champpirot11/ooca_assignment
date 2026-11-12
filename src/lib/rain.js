@@ -23,7 +23,7 @@ export function createRain(canvas, opt) {
   function resize() {
     const r = canvas.getBoundingClientRect();
     if (!r.width) return;
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
     renderer.setSize(r.width, r.height, false);
   }
   const v3 = new THREE.Vector3();
