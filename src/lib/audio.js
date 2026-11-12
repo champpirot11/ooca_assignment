@@ -159,7 +159,7 @@ export const audio = {
   music(on) { musicOn(on); },
   // ฉาก: เปลี่ยนความดังของฝนและพื้นเสียงตามหน้า
   scene(name, stage) {
-    const S = { rain: [1, .0], hand: [.65, .55], walk: [.85, 0], shop: [.45, 0] };
+    const S = { home: [.35, 0], rain: [1, .0], hand: [.65, .55], walk: [.85, 0], shop: [.45, 0] };
     const [r, d] = S[name] || [0, 0];
     rainTarget = r; dropRate = 0; scn = name + (stage || ''); if (ctx && bus.rainLP && name !== 'shop') bus.rainLP.frequency.setTargetAtTime(20000, ctx.currentTime, .3);
     if (name === 'shop' && ctx) bus.hum.gain.setTargetAtTime(.012, ctx.currentTime, 1.2);

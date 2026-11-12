@@ -45,7 +45,8 @@
 /* บับเบิล */
 .sf-bubble { position: absolute; left: 0; top: 0; z-index: 4; max-width: calc(306 * var(--u)); padding: calc(14 * var(--u)) calc(16 * var(--u)) calc(15 * var(--u)); background: #fff; border-radius: calc(18 * var(--u)); box-shadow: 0 calc(6 * var(--u)) calc(16 * var(--u)) rgba(120, 72, 25, .16); opacity: 0; scale: .8; transform-origin: var(--tail, 40px) 100%; transition: opacity .45s ease, scale .6s cubic-bezier(.3, 1.35, .5, 1), transform 1.5s cubic-bezier(.45, 0, .25, 1); pointer-events: none; }
 .sf-bubble.on { opacity: 1; scale: 1; }
-.sf-bubble::after { content: ''; position: absolute; left: calc(var(--tail, 40px) - 12 * var(--u)); top: calc(100% - 1px); border: calc(12 * var(--u)) solid transparent; border-top-color: #fff; border-bottom: 0; border-left-width: calc(4 * var(--u)); }
+/* หางบับเบิ้ลแบบมน: สี่เหลี่ยมหมุน 45° ปลายโค้ง */
+.sf-bubble::after { content: ''; position: absolute; left: calc(var(--tail, 40px) - 9 * var(--u)); top: calc(100% - 10 * var(--u)); width: calc(18 * var(--u)); height: calc(18 * var(--u)); background: #fff; transform: rotate(45deg); border-radius: 0 0 calc(6 * var(--u)) 0; }
 .sf-bubble b { display: block; color: var(--teal); font-weight: 500; font-size: calc(14 * var(--u)); line-height: 1.3; }
 .sf-bubble p .r { visibility: hidden; }
 .sf-dyn.locked { pointer-events: none; }
@@ -153,4 +154,4 @@
 }
 
 /* บับเบิ้ลข้างตัว (จอเตี้ย/กล่องขาวสูง): หางชี้ไปทางซ้ายหาตัว */
-.sf-bubble.side::after { left: calc(-10 * var(--u)); top: calc(22 * var(--u)); border: calc(9 * var(--u)) solid transparent; border-right: calc(12 * var(--u)) solid #fff; border-left: 0; }
+.sf-bubble.side::after { left: calc(-7 * var(--u)); top: calc(20 * var(--u)); border-radius: 0 0 0 calc(6 * var(--u)); }

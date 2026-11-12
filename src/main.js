@@ -1,3 +1,4 @@
+import { createHome } from './pages/home.js';
 import '@fontsource/prompt/400.css';
 import '@fontsource/prompt/500.css';
 import '@fontsource/prompt/600.css';
@@ -55,10 +56,9 @@ const next = () => { if (cur < LAST && performance.now() >= unlockAt) { audio.ta
 const back = () => { if (cur > 0) { audio.back(); go(cur - 1); } };
 
 // แตะที่ไหนก็ได้บนจอ = ไปต่อ (ยกเว้นปุ่มด้านบนและปุ่ม CTA)
-let heard = false;   // เบราว์เซอร์มือถือไม่ยอมเล่นเสียงจนกว่าจะแตะครั้งแรก → แตะแรกที่ฉาก 1 = เปิดเสียงฝนก่อน ยังไม่เปลี่ยนฉาก
 screenEl.addEventListener('click', (e) => {
   audio.unlock();
-  if (!heard) { heard = true; if (cur === 0 && !e.target.closest('.back, .skip, .cta, .sound')) return; }
+  if (home.on) return;
   if (screenEl.classList.contains('in-shop')) return;
   if (e.target.closest('.back, .skip, .cta, .sound')) return;
   next();   // แตะตรงไหนก็ไปฉากต่อไป (ย้อนกลับใช้ปุ่ม <)
@@ -70,23 +70,28 @@ paintSound();
 $('back').addEventListener('click', () => { audio.unlock(); back(); });
 $('skip').addEventListener('click', () => { if (cur < LAST) go(LAST); });
 const talk = createShopFlow({ onExit: leaveShop }); screenEl.appendChild(talk.el);
-function leaveShop() { talk.stop(); screenEl.classList.remove('in-shop'); cur = -1; go(0); }   // จบแล้วกลับหน้าแรก คำตอบถูกล้างแล้ว
+// หน้าแรก: กดปุ่ม = ปลดล็อกเสียง แล้วเริ่มบทเกริ่นฉาก 1 พร้อมเสียงฝน
+const home = createHome({ onEnter: () => { audio.unlock(); home.hide(); resetPrologue(); go(0); } }); screenEl.appendChild(home.el); home.mount();
+const startHome = !(param('step', 0) || param('talk', 0)); if (!startHome) home.hide();
+function resetPrologue() { Object.values(pages).forEach((p) => { p.el.classList.remove('on'); p.leave?.(); }); copyEls.forEach((c) => c.classList.remove('on')); hint.classList.remove('on'); cta.classList.remove('on'); clearTimeout(hintTimer); cur = -1; }
+function leaveShop() { talk.stop(); screenEl.classList.remove('in-shop'); resetPrologue(); home.show(); audio.scene('home'); }   // จบแล้วกลับหน้าแรก   // จบแล้วกลับหน้าแรก คำตอบถูกล้างแล้ว
 function enterShop(from = 0) { audio.unlock(); screenEl.classList.add('in-shop'); window.dispatchEvent(new CustomEvent('prologue:done')); talk.start(from); }
 cta.addEventListener('click', () => enterShop());
 addEventListener('keydown', (e) => { if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { if (e.target.closest?.('button')) return; e.preventDefault(); next(); } if (e.key === 'ArrowLeft') back(); });
 
 /* ===== ลูปหลัก: ทุกหน้าใช้ rAF ตัวเดียว ===== */
-function resize() { Object.values(pages).forEach((p) => p.resize?.()); }
+function resize() { Object.values(pages).forEach((p) => p.resize?.()); home.resize(); }
 addEventListener('resize', resize);
 let last = performance.now();
 function loop(now) {
   requestAnimationFrame(loop);
   const dt = Math.max(0, Math.min((now - last) / 1000, .05)); last = now;
+  if (home.on) { home.tick(dt); return; }
   const s = STEPS[cur]; if (s) pages[s.page].tick(dt);
 }
 
-go(Math.max(0, Math.min(LAST, +param('step', 1) - 1)));
-{ const t = +param('t', 0); const p = pages[STEPS[cur].page]; for (let k = 0; k < t * 60; k++) p.tick(1 / 60); }   // ?step=3&t=5 ข้ามไปดูช่วงนั้นเลย (ไว้ทดสอบ)
+if (!startHome) go(Math.max(0, Math.min(LAST, +param('step', 1) - 1)));
+if (cur >= 0) { const t = +param('t', 0); const p = pages[STEPS[cur].page]; for (let k = 0; k < t * 60; k++) p.tick(1 / 60); }   // ?step=3&t=5 ข้ามไปดูช่วงนั้นเลย (ไว้ทดสอบ)
 requestAnimationFrame(loop);
 window.__prologue = { go, pages, talk, enterShop };
 if (param('talk')) enterShop();   // ?talk=1 ข้ามไปฉากคุยเลย (ไว้ทดสอบ)

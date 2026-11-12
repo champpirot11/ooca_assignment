@@ -75,7 +75,11 @@ export function createShopFlow({ onExit } = {}) {
     bubble.style.transitionDuration = (REDUCE ? 0 : dur) + 'ms'; bubble.style.transform = `translate(${left}px,${y}px)`; bubble.style.setProperty('--tail', clamp(sx - left, 26 * u, bw - 26 * u) + 'px');
   }
   new ResizeObserver(() => alive && layout(1100)).observe(sin); addEventListener('resize', () => alive && layout(0));
-  if (window.visualViewport) visualViewport.addEventListener('resize', () => { kb = Math.max(0, innerHeight - visualViewport.height - visualViewport.offsetTop); if (alive) layout(200); });
+  // แป้นพิมพ์มือถือ: ยกกล่องขาวตามแป้น · หุบแป้นแล้วต้องกลับลงที่เดิม (iOS บางทีไม่ส่ง resize ตอนหุบ → เช็กซ้ำตอน blur/scroll ด้วย)
+  function readKb() { const v = window.visualViewport; let k = v ? Math.max(0, innerHeight - v.height - v.offsetTop) : 0; if (k < 80 || !el.querySelector('textarea:focus, input:focus')) k = 0; if (k !== kb) { kb = k; if (alive) layout(220); } }
+  if (window.visualViewport) { visualViewport.addEventListener('resize', readKb); visualViewport.addEventListener('scroll', readKb); }
+  el.addEventListener('focusout', () => { setTimeout(() => { readKb(); if (!kb) window.scrollTo(0, 0); }, 60); setTimeout(readKb, 400); });
+  el.addEventListener('focusin', () => setTimeout(readKb, 350));
   function placeMasc(dur = 0) { masc.style.transitionDuration = dur + 'ms'; masc.style.left = m.x + 'px'; masc.style.top = m.y + 'px'; }
   function pose(p, flip = m.flip) {
     m.pose = p; m.flip = flip;   // ทิศหันเก็บไว้ที่แต่ละภาพ → ภาพเก่าที่กำลังจางไม่พลิกกลับ/วาป

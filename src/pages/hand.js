@@ -6,7 +6,7 @@ import handUrl from '../art/r_hand.glb?url';
 import { REDUCE, DW, DH } from '../lib/util.js';
 import { audio } from '../lib/audio.js';
 
-const SLIDE_DELAY = .5, SLIDE_IN = 3.4;                   // มือค่อยๆ ลอยขึ้นมารับฝน
+const SLIDE_DELAY = .15, SLIDE_IN = 2.2;                   // มือค่อยๆ ลอยขึ้นมารับฝน
 const smooth = (x) => { x = Math.min(1, Math.max(0, x)); return .5 - .5 * Math.cos(Math.PI * x); };
 
 export function createHandPage() {
