@@ -3,6 +3,7 @@
 import rainUrl from '../art/audio/rain.ogg?url';
 import stepUrl from '../art/audio/step-water.ogg?url';
 import musicUrl from '../art/audio/shop-loop.mp3?url';
+import introUrl from '../art/audio/intro-music.mp3?url';   // "Sad Quiet Goodbye Letter" — Alex Morgan (Pixabay)
 const KEY = 'ooca-sound';
 // ช่วงของแต่ละก้าวใน step-water.ogg [เริ่ม, ยาว] วินาที (ตามตารางตัดของผู้ทำไฟล์)
 const STEP_SLICES = [[0.08, 0.854], [1.014, 0.704], [1.798, 0.624], [2.502, 0.624], [3.206, 0.854]];
@@ -12,7 +13,7 @@ async function loadBuf(name, url) {
     let ab;
     if (url.startsWith('data:')) { const b = atob(url.split(',')[1]), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); ab = u.buffer; }   // ไฟล์เดียวแบบฝัง: ไม่ใช้ fetch
     else ab = await (await fetch(url)).arrayBuffer();
-    bufs[name] = await ctx.decodeAudioData(ab); if (name === 'rain') startRain(); if (name === 'music' && M.on) useFileMusic();
+    bufs[name] = await ctx.decodeAudioData(ab); if (name === 'rain') startRain(); if (name === 'music' && M.on) useFileMusic(); if (name === 'intro') introSet();
   } catch (e) { console.warn('โหลดเสียงไม่ได้', name, e); }
 }
 function startRain() {
@@ -41,7 +42,7 @@ function init() {
   if (ctx) return true;
   const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
   ctx = new AC(); master = ctx.createGain(); master.gain.value = muted ? 0 : 1; master.connect(ctx.destination);
-  loadBuf('rain', rainUrl); loadBuf('step', stepUrl); loadBuf('music', musicUrl);        // ฝน = ไฟล์จริง CC0 (Ylmir + ลม + ฟ้าร้องไกลๆ) · ก้าวเท้า = ย่ำน้ำจริง CC0
+  loadBuf('rain', rainUrl); loadBuf('step', stepUrl); loadBuf('music', musicUrl); loadBuf('intro', introUrl);        // ฝน = ไฟล์จริง CC0 (Ylmir + ลม + ฟ้าร้องไกลๆ) · ก้าวเท้า = ย่ำน้ำจริง CC0
   bus.rainBed = { gain: { setTargetAtTime() {} } }; bus.rainLow = bus.rainBed;
   // ฮัมหลอดไฟอุ่นๆ
   const hg = ctx.createGain(); hg.gain.value = 0; const hf = filt('lowpass', 420);
@@ -91,6 +92,16 @@ const CHORDS = [                    // Cmaj9 · Am9 · Dm9 · G13
   { b: 43, v: [53, 59, 62, 64] },
 ];
 const PENTA = [72, 74, 76, 79, 81, 84];
+// เพลงคลอบทเกริ่น (เปียโนเศร้าเบาๆ) — เล่นวนใต้เสียงฝน ตั้งแต่ฉาก 1 จนเข้าร้าน แล้วเฟดออกให้เพลงในร้านแทน
+const IN = { on: false, src: null, g: null };
+function introSet() {
+  if (!ctx || !bufs.intro) return;
+  if (!IN.g) { IN.g = ctx.createGain(); IN.g.gain.value = 0; IN.g.connect(master); }
+  const t = ctx.currentTime;
+  if (IN.on && !IN.src) { const s = ctx.createBufferSource(); s.buffer = bufs.intro; s.loop = true; s.connect(IN.g); s.start(); IN.src = s; }
+  IN.g.gain.cancelScheduledValues(t); IN.g.gain.setTargetAtTime(IN.on ? .32 : 0, t, IN.on ? 1.6 : 1.2);
+  if (!IN.on && IN.src) { const s = IN.src; IN.src = null; setTimeout(() => { if (!IN.on) try { s.stop(); } catch (e) {} else IN.src = IN.src || s; }, 6000); }
+}
 function musicBus() {
   if (M.bus) return M.bus;
   const mg = ctx.createGain(); mg.gain.value = 0;
@@ -152,18 +163,31 @@ function musicOn(on) {
   }
 }
 
+// ข้อ 4: เสียงสั้นๆ (ไม่ถึง 1 วิ) บุคลิกต่างกันตามแต่ละตัวเลือก (เรียงตาม SONGS)
+const N = (m) => 440 * Math.pow(2, (m - 69) / 12);
+const VIBE = [
+  () => [72, 76, 79, 84].forEach((m, i) => tone({ f: N(m), f2: N(m), dur: .32, g: .022, type: 'triangle', at: i * .07 })),                                   // สดใส: ไล่ขึ้นเร็วๆ
+  () => [65, 69, 72, 76].forEach((m, i) => tone({ f: N(m), f2: N(m), dur: .9, g: .016, type: 'sine', at: i * .11 })),                                         // ช้าๆ สบาย: คอร์ดนุ่มค่อยๆ ไล่
+  () => [57, 60, 64].forEach((m, i) => { tone({ f: N(m), f2: N(m) * .995, dur: .85, g: .02, type: 'triangle', at: i * .09 }); tone({ f: N(m) * 2, f2: N(m) * 2, dur: .4, g: .004, at: i * .09 }); }),   // เศร้า: คอร์ดไมเนอร์หม่น
+  () => tone({ f: N(84), f2: N(84), dur: .9, g: .01, type: 'sine' }),                                                                                           // เงียบๆ: โน้ตเดียวเบามาก
+  () => { tone({ f: 110, f2: 45, dur: .35, g: .08, type: 'sine' }); [40, 47, 52].forEach((m, i) => tone({ f: N(m), f2: N(m), dur: .6, g: .022, type: 'triangle', at: .04 + i * .03 })); },   // หนักๆ: ทุ้มหนัก
+  () => { [79, 76, 72, 74].forEach((m, i) => tone({ f: N(m), f2: N(m) * .997, dur: .45, g: .016, type: 'triangle', at: i * .13 })); },                         // คิดถึงวันเก่า: กล่องดนตรี
+  () => [64, 67, 71, 67, 64].forEach((m, i) => tone({ f: N(m), f2: N(m), dur: .2, g: .014, type: 'sine', at: i * .09 })),                                     // วนๆ คิดไม่หยุด: วนไปวนมา
+  () => [60, 62, 64, 67, 72].forEach((m, i) => tone({ f: N(m), f2: N(m), dur: .4, g: .01 + i * .003, type: 'triangle', at: i * .12 })),                       // ค่อยๆ ดีขึ้น: ก้าวขึ้นทีละขั้น
+];
 export const audio = {
+  vibe(i) { if (!ctx || muted) return; VIBE[i]?.(); },
   get muted() { return muted; },
   unlock() { if (!init()) return; if (ctx.state === 'suspended') ctx.resume(); dropLoop(); },
   setMuted(m) { muted = m; try { localStorage.setItem(KEY, m ? 'off' : 'on'); } catch (e) {} if (ctx) master.gain.setTargetAtTime(m ? 0 : 1, ctx.currentTime, .08); },
   music(on) { musicOn(on); },
   // ฉาก: เปลี่ยนความดังของฝนและพื้นเสียงตามหน้า
   scene(name, stage) {
-    const S = { home: [.35, 0], rain: [1, .0], hand: [.65, .55], walk: [.85, 0], shop: [.45, 0] };
+    const S = { home: [.35, 0], shopfront: [.8, 0], rain: [1, .0], hand: [.65, .55], walk: [.85, 0], shop: [.45, 0] };
     const [r, d] = S[name] || [0, 0];
     rainTarget = r; dropRate = 0; scn = name + (stage || ''); if (ctx && bus.rainLP && name !== 'shop') bus.rainLP.frequency.setTargetAtTime(20000, ctx.currentTime, .3);
     if (name === 'shop' && ctx) bus.hum.gain.setTargetAtTime(.012, ctx.currentTime, 1.2);
-    musicOn(name === 'shop');
+    musicOn(name === 'shop'); IN.on = ['rain', 'hand', 'walk', 'shopfront'].includes(name); introSet();
     if (name !== 'shop' && name !== 'walk' && ctx) bus.hum.gain.setTargetAtTime(0, ctx.currentTime, .4);
   },
   // ในร้าน: ฝนข้างนอกเบาลงและอู้อี้ (level 0..1, cutoff Hz) + ฮัมไฟเบาๆ

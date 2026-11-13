@@ -59,6 +59,7 @@ src/
 | `src/art/audio/rain.ogg` เสียงฝน (ผสมจาก 3 แหล่ง) | [Rain (loopable)](https://opengameart.org/content/rain-loopable) โดย Ylmir · [wind1](https://opengameart.org/content/wind1) โดย Luke.RUSTLTD · [100 CC0 SFX #2](https://opengameart.org/content/100-cc0-sfx-2) โดย rubberduck (ฟ้าร้องไกลๆ) — มิกซ์เป็นลูปโดย roxycon-dev/Ciallo-Reader | CC0 1.0 |
 | `src/art/audio/step-water.ogg` เสียงย่ำน้ำ | [Footsteps_Walk.wav](https://freesound.org/people/Nox_Sound/sounds/490951/) โดย Nox_Sound · [Wading in Shallow Water.wav](https://freesound.org/people/ryansitz/sounds/342932/) โดย ryansitz — ตัดต่อโดย dgreenheck/tidewater | CC0 1.0 |
 | `src/art/audio/shop-loop.mp3` เพลงพื้นหลังในร้าน | [Piano Background Gentle Study Flow](https://pixabay.com/th/music/%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B9%80%E0%B8%A5%E0%B8%81-piano-background-gentle-study-flow-578490/) โดย alex-morgan จาก Pixabay — ตัดต่อเป็นลูปเนียน ปรับความดัง และบีบอัดเป็นโมโน 72 kbps (ไม่ใช่ไฟล์ต้นฉบับ) | [Pixabay Content License](https://pixabay.com/service/license-summary/) (ใช้ฟรีรวมเชิงพาณิชย์ ไม่ต้องให้เครดิตแต่ใส่ไว้เพื่อความโปร่งใส) |
+| `src/art/audio/intro-music.mp3` เพลงคลอบทเกริ่น | Sad Quiet Goodbye Letter โดย alex-morgan จาก Pixabay (ไฟล์ที่ Panupong เลือกมา) — บีบอัดเป็น 96 kbps | [Pixabay Content License](https://pixabay.com/service/license-summary/) |
 | เสียงไฟฮัม/กระพริบ, เสียงแตะ, เสียงหยดบนฝ่ามือ | สังเคราะห์สดด้วย Web Audio ใน `src/lib/audio.js` | ของผู้ทำ |
 | Three.js r128 | mrdoob/three.js | MIT |
 | ฟอนต์ Prompt (@fontsource/prompt) | Cadson Demak | SIL OFL 1.1 |

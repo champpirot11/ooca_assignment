@@ -44,7 +44,7 @@ function go(n) {
     if (prev) { const pp = pages[prev.page]; pp.el.classList.remove('on'); clearTimeout(leaveTimers[prev.page]); leaveTimers[prev.page] = setTimeout(() => pp.leave(), 750); }
     const np = pages[nxt.page]; clearTimeout(leaveTimers[nxt.page]); np.enter({ stage: nxt.stage }); np.el.classList.add('on');
   } else pages[nxt.page].setStage?.(nxt.stage);
-  cur = n; audio.scene(nxt.page, nxt.stage); screenEl.classList.toggle('last', n === LAST); screenEl.classList.toggle('first', n === 0);
+  cur = n; audio.scene(nxt.page === 'shop' ? 'shopfront' : nxt.page, nxt.stage);   // หน้าร้าน (ฉาก 5) ยังเป็นเพลงบทเกริ่น เพลงในร้านเริ่มตอนเข้าร้าน screenEl.classList.toggle('last', n === LAST); screenEl.classList.toggle('first', n === 0);
   progress.forEach((p, i) => p.classList.toggle('on', i <= n));
   $('progress').setAttribute('aria-valuenow', n + 1);
   copyEls.forEach((c, i) => c.classList.toggle('on', i === n));
