@@ -98,9 +98,11 @@ function introSet() {
   if (!ctx || !bufs.intro) return;
   if (!IN.g) { IN.g = ctx.createGain(); IN.g.gain.value = 0; IN.g.connect(master); }
   const t = ctx.currentTime;
+  if (IN.on && IN.src && IN.stopT) { try { IN.src.stop(); } catch (e) {} IN.src = null; }   // ตัวเก่าที่กำลังจะหยุด → หยุดเลย แล้วเริ่มใหม่ที่ 0:25 (ไม่เล่นซ้อน)
   if (IN.on && !IN.src) { const s = ctx.createBufferSource(); s.buffer = bufs.intro; s.loop = true; const T0 = Math.min(25, s.buffer.duration - 1); s.loopStart = T0; s.loopEnd = s.buffer.duration; s.connect(IN.g); s.start(0, T0); IN.src = s; }   // เริ่มที่วินาทีที่ 0:25 ของเพลง (วนกลับมาที่จุดเดิม)
   IN.g.gain.cancelScheduledValues(t); IN.g.gain.setTargetAtTime(IN.on ? .32 : 0, t, IN.on ? 1.6 : 1.2);
-  if (!IN.on && IN.src) { const s = IN.src; IN.src = null; setTimeout(() => { if (!IN.on) try { s.stop(); } catch (e) {} else IN.src = IN.src || s; }, 6000); }
+  clearTimeout(IN.stopT); IN.stopT = 0;   // เปิดกลับมาก่อนเพลงเฟดหมด → ใช้ตัวเดิมต่อ ไม่สร้างซ้อน (เดิมมีบั๊กเพลงเล่นซ้อน 2 ตัว)
+  if (!IN.on && IN.src) IN.stopT = setTimeout(() => { if (!IN.on && IN.src) { try { IN.src.stop(); } catch (e) {} IN.src = null; } }, 6000);
 }
 function musicBus() {
   if (M.bus) return M.bus;
