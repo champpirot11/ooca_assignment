@@ -38,6 +38,7 @@ const graphemes = (t) => (SEG ? [...SEG.segment(t)].map((x) => x.segment) : Arra
 const wait = (ms) => new Promise((r) => setTimeout(r, REDUCE ? Math.min(ms, 120) : ms));
 const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+export { POSE, FEET, WALK, POSE_URL };   // ใช้ซ้ำในหน้าแรก (ooca เดินเล่นในร้าน)
 export function createShopFlow({ onExit } = {}) {
   const el = document.createElement('section');
   el.className = 'sf'; el.setAttribute('aria-label', 'ในร้านแผ่นเสียง ooca ฟังใจ');
