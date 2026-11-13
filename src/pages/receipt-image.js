@@ -13,7 +13,9 @@ function paint(c, d, logo, on) {
   if (on && logo) c.drawImage(logo, W / 2 - 62, y, 124, 124 * logo.height / logo.width); y += 84;
   T('ร้านแผ่นเสียง ooca - ฟังใจ', W / 2, F(500, 26), '#2b2b2b', 'center'); y += 32; T('ที่หลบฝนสำหรับใจที่เหนื่อย', W / 2, F(400, 19), '#5b5b5b', 'center'); y += 44;
   T(d.when, P, F(400, 18), '#8d8d8d'); T('#0001', W - P, F(400, 18), '#8d8d8d', 'right'); dash();
-  T(`แผ่นเสียง · ${d.mood.th} (${d.mood.en})`, P, F(400, 20), '#2b2b2b'); T('0.00', W - P, F(400, 20), '#2b2b2b', 'right'); y += 28; T('เพลง: ' + d.track, P, F(400, 17), '#8d8d8d'); y += 34;
+  // ปกแผ่นเล็กๆ หน้ารายการแผ่นเสียง
+  const cw = 58, cx = P + cw + 14; if (on && d.coverImg) c.drawImage(d.coverImg, P, y - 22, cw, cw * 86 / 89);
+  T(`แผ่นเสียง · ${d.mood.th} (${d.mood.en})`, cx, F(400, 20), '#2b2b2b'); T('0.00', W - P, F(400, 20), '#2b2b2b', 'right'); y += 28; T('เพลง: ' + d.track, cx, F(400, 17), '#8d8d8d'); y += 34;
   for (const r of ['ที่นั่งหลบฝน (ไม่จำกัดเวลา)', 'คนฟังคุณเล่า']) { T(r, P, F(400, 20), '#2b2b2b'); T('0.00', W - P, F(400, 20), '#2b2b2b', 'right'); y += 34; } y -= 12; dash();
   T('รวมทั้งหมด', P, F(500, 26), '#2b2b2b'); T('0.00', W - P, F(500, 26), '#2b2b2b', 'right'); y += 34; T('ชำระด้วย: การเข้ามาหลบฝน', P, F(400, 19), '#2b2b2b'); dash();
   T('ถึงคุณ' + (d.topic ? ' เรื่อง' + d.topic : ''), P, F(400, 18), '#8d8d8d'); y += 8; c.font = F(500, 24);
@@ -31,7 +33,8 @@ function paint(c, d, logo, on) {
 }
 export async function saveReceipt(d) {
   try { await Promise.all([document.fonts.load('400 20px Prompt'), document.fonts.load('500 20px Prompt')]); } catch (e) {}
-  const logo = await new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = d.logoUrl; });
+  const img = (src) => new Promise((res) => { if (!src) return res(null); const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+  const [logo, coverImg] = await Promise.all([img(d.logoUrl), img(d.cover)]); d = { ...d, coverImg };
   const W = 600, H = paint(document.createElement('canvas').getContext('2d'), d, logo, false) + 16, k = 2;
   const cv = document.createElement('canvas'); cv.width = W * k; cv.height = H * k; const c = cv.getContext('2d'); c.scale(k, k);
   c.fillStyle = '#F7F7F9'; c.fillRect(0, 0, W, H - 16); paint(c, d, logo, true);

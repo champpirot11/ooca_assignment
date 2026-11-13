@@ -6,6 +6,8 @@
 import sceneUrl from '../art/shop/scene.svg?url';
 import facesUrl from '../art/shop/faces.svg?url';
 import logoUrl from '../art/shop/ooca-logo.svg?url';
+// ปกแผ่นเสียง 8 มู้ด (ออกแบบโดย Panupong) — ชื่อไฟล์ cover-<มู้ด>.svg
+const COVER = Object.fromEntries(Object.entries(import.meta.glob('../art/covers/cover-*.svg', { eager: true, query: '?url', import: 'default' })).map(([k, v]) => [k.match(/cover-(\w+)\.svg/)[1], v]));
 import { audio } from '../lib/audio.js';
 import { REDUCE, clamp } from '../lib/util.js';
 import { createRain } from '../lib/rain.js';
@@ -285,7 +287,7 @@ export function createShopFlow({ onExit } = {}) {
     setBtn(''); el.classList.add('needle'); await wait(1700); audio.fx('needle'); await wait(600);
     try { widget?.play(); } catch (e) {} setPlaying(true); audio.music(false); pose('listen'); hop(); cam.boost = 1;
     embed.hidden = false; top.classList.add('small');
-    dyn.insertAdjacentHTML('afterbegin', `<div class="sf-mean"><small>ความหมายจากเพลง</small><b>${esc(TRACK.title)}</b><p>${esc(TRACK.meaning)}</p></div>`);
+    dyn.insertAdjacentHTML('afterbegin', `<div class="sf-mean"><div class="sf-cv"><img src="${COVER[st.mood]}" alt="ปกแผ่น ${mood.th}"><span><small>แผ่นของคุณวันนี้</small><b class="mood">${mood.th}</b><i>${mood.en}</i></span></div><small>ความหมายจากเพลง</small><b>${esc(TRACK.title)}</b><p>${esc(TRACK.meaning)}</p></div>`);
     dyn.querySelector('#sfgo').insertAdjacentHTML('afterend', '<button class="sf-skip" id="sfskip">รับใบเสร็จ</button>'); say('ฟังไปด้วยกันนะครับ');
     setBtn('พักฟังเพลงสักแป๊บนะ', false); const my = run; setTimeout(() => { if (my === run && dyn.classList.contains('sf-player')) { setBtn('รับใบเสร็จ'); dyn.querySelector('#sfskip')?.remove(); } }, 10000);
     await press();
@@ -295,10 +297,10 @@ export function createShopFlow({ onExit } = {}) {
     const mood = MOODS[st.mood], d = new Date(), MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
     const when = `${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear() + 543} · ${String(d.getHours()).padStart(2, '0')}.${String(d.getMinutes()).padStart(2, '0')} น.`;
     const topic = st.topics.length && !st.heavy ? TOPICS[st.topics[0]].label : null, heart = st.heavy ? 'แค่มาถึงตรงนี้ ก็พอแล้วนะ ไม่ต้องทำอะไรต่อก็ได้' : HEART[topic] || HEART._;
-    const data = { when, mood, track: TRACK.title, topic, heart, action: st.heavy ? null : ACTION(st.battery), heavy: st.heavy, logoUrl };
+    const data = { when, mood, cover: COVER[st.mood], track: TRACK.title, topic, heart, action: st.heavy ? null : ACTION(st.battery), heavy: st.heavy, logoUrl };
     say.hide(); pose('listen'); top.innerHTML = ''; top.classList.remove('small'); embed.classList.add('slim');
     swapOut(); dyn.className = 'sf-dyn sf-rc'; dyn.innerHTML = `<div class="sf-rcw" id="rcw"><i class="slot"></i><div class="sf-paperr" id="rp"><img class="lg" src="${logoUrl}" alt="ooca"><b class="nm">ร้านแผ่นเสียง ooca - ฟังใจ</b><small>ที่หลบฝนสำหรับใจที่เหนื่อย</small>
-      <div class="r sm"><span>${when}</span><span>#0001</span></div><hr><div class="r"><span>แผ่นเสียง · ${mood.th}<br>(${mood.en})<br><small>เพลง: ${esc(TRACK.title)}</small></span><span>0.00</span></div><div class="r"><span>ที่นั่งหลบฝน (ไม่จำกัดเวลา)</span><span>0.00</span></div><div class="r"><span>คนฟังคุณเล่า</span><span>0.00</span></div><hr>
+      <div class="r sm"><span>${when}</span><span>#0001</span></div><hr><div class="r cv"><img src="${COVER[st.mood]}" alt=""><span>แผ่นเสียง · ${mood.th}<br>(${mood.en})<br><small>เพลง: ${esc(TRACK.title)}</small></span><span>0.00</span></div><div class="r"><span>ที่นั่งหลบฝน (ไม่จำกัดเวลา)</span><span>0.00</span></div><div class="r"><span>คนฟังคุณเล่า</span><span>0.00</span></div><hr>
       <div class="r tot"><span>รวมทั้งหมด</span><span>0.00</span></div><div class="r"><span>ชำระด้วย: การเข้ามาหลบฝน</span></div><hr>
       <div class="hrt"><small>ถึงคุณ${topic ? ' เรื่อง' + topic : ''}</small><p>${heart}</p><em>— ooca</em></div>${data.action ? `<hr><div class="act"><small>ลองทำสัก 1 นาที</small><p>${data.action}</p></div>` : ''}
       <hr><div class="hl">${st.heavy ? '<b>สายด่วนสุขภาพจิต 1323 (24 ชั่วโมง)</b><br>ถ้าอยู่ในอันตรายตอนนี้โทร 1669' : 'ถ้าอยากคุยกับใครสักคน โทร 1323 ได้ตลอด 24 ชั่วโมง'}</div><i class="bar"></i><p class="th">ขอบคุณที่แวะมานะครับ<br>ฝนหยุดเมื่อไหร่ ก็กลับมาได้เสมอ</p></div></div>
