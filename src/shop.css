@@ -102,9 +102,15 @@
 /* ข้อ 4 เพลง */
 .sf-opts { display: flex; flex-direction: column; gap: calc(10 * var(--u)); max-height: calc(262 * var(--u)); overflow-y: auto; margin: 0 calc(-8 * var(--u)); padding: 0 calc(8 * var(--u)) calc(26 * var(--u)); scrollbar-width: none; -webkit-mask: linear-gradient(#000 82%, transparent); mask: linear-gradient(#000 82%, transparent); } .sf-opts::-webkit-scrollbar { display: none; }
 .sf-opt { flex: none; display: flex; align-items: center; gap: calc(14 * var(--u)); height: calc(62 * var(--u)); padding: 0 calc(18 * var(--u)) 0 calc(10 * var(--u)); border-radius: calc(31 * var(--u)); background: #F7F7F9; font-size: calc(16 * var(--u)); font-weight: 600; text-align: left; transition: background .5s, color .5s; }
-.sf-opt .v { flex: none; width: calc(42 * var(--u)); height: calc(42 * var(--u)); border-radius: 50%; background: radial-gradient(circle, #fff 0 7%, var(--c) 8% 30%, #23244a 31%); }
+.sf-opt .v { flex: none; width: calc(42 * var(--u)); height: calc(42 * var(--u)); border-radius: 50%;   /* แผ่นเสียงมีลาย ให้เห็นว่าหมุน */
+  background: radial-gradient(circle, #fff 0 6%, transparent 7%),
+    linear-gradient(90deg, transparent 38%, rgba(255,255,255,.85) 38% 62%, transparent 62%) center / 60% 10% no-repeat,
+    radial-gradient(circle at 50% 22%, rgba(255,255,255,.9) 0 4%, transparent 5%),
+    radial-gradient(circle, var(--c) 0 30%, transparent 31%),
+    conic-gradient(from 0deg, rgba(255,255,255,.3) 0 7%, transparent 7% 50%, rgba(255,255,255,.18) 50% 56%, transparent 56%),
+    repeating-radial-gradient(circle, #23244a 0 1.6px, #34366a 1.6px 2.6px); }
 .sf-opt span { flex: 1; } .sf-opt .ck { width: calc(20 * var(--u)); height: calc(20 * var(--u)); border-radius: 50%; border: 1.5px solid #cfcfcf; display: grid; place-items: center; transition: all .25s; } .sf-opt .ck svg { width: 70%; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
-.sf-opt[aria-pressed="true"] { background: #E2F7F4; color: #1FA79A; } .sf-opt[aria-pressed="true"] .ck { background: #1FA79A; border-color: #1FA79A; } .sf-opt[aria-pressed="true"] .ck svg { opacity: 1; } .sf-opt[aria-pressed="true"] .v { animation: spin 2.4s linear infinite; background: radial-gradient(circle, #fff 0 7%, var(--c) 8% 30%, #23244a 31%), conic-gradient(#fff3, transparent); background-blend-mode: normal; box-shadow: inset calc(8 * var(--u)) 0 calc(6 * var(--u)) rgba(255, 255, 255, .12); }
+.sf-opt[aria-pressed="true"] { background: #E2F7F4; color: #1FA79A; } .sf-opt[aria-pressed="true"] .ck { background: #1FA79A; border-color: #1FA79A; } .sf-opt[aria-pressed="true"] .ck svg { opacity: 1; } .sf-opt[aria-pressed="true"] .v { animation: spin 2.4s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ข้อ 5 โน้ต */
@@ -172,3 +178,10 @@
 /* หน้าฟังเพลง: ความหมายเด่นกว่าชื่อเพลง */
 .sf-mean p.mn { color: #00897D; font-size: calc(17 * var(--u)); font-weight: 500; line-height: 1.6; margin: calc(4 * var(--u)) 0 calc(8 * var(--u)); }
 .sf-mean b.tt { color: #8d8d8d; font-size: calc(13 * var(--u)); font-weight: 400; line-height: 1.5; margin: 0; }
+/* ปกแผ่นเสียงบนแผ่นที่มาสคอตถือ */
+.sf-body .held > img:first-child { display: block; width: 100%; max-width: none !important; }
+.sf-body .held .cvw { position: absolute; inset: 0; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; pointer-events: none; }
+.sf-body .held .cv { position: absolute; left: 0; top: 0; width: 100%; max-width: none !important; transform-origin: 0 0; }
+.sf-body .held .cv:not([src]) { display: none; }
+
+.sf-hint.warn { color: #C0563F; }

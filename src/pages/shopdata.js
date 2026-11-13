@@ -138,3 +138,11 @@ const KEYS = [...WORDS, ...PHRASES].map(norm);
 const KNIFE = /มีด(?![ีิ])/;   // มีด ทุกแบบ ยกเว้น "มีดี" (มี+ดี) ที่ไม่เกี่ยวกัน
 export const isRisk = (t) => { if (!t) return false; const x = norm(t); return KEYS.some((w) => x.includes(w)) || KNIFE.test(x) || EN.test(t.replace(/\s+/g, ' ')); };
 export const RISK_WORDS = { WORDS, PHRASES };
+
+// ข้อ 5 — คำหยาบ: ยังส่งไม่ได้ ให้เปลี่ยนเป็นคำที่สุภาพขึ้น (คำเสี่ยงทำร้ายตัวเองไม่นับตรงนี้ — ส่งได้เสมอเพื่อพาไปหน้าดูแล)
+const RUDE = ['เหี้ย', 'เหี้ยะ', 'เชี่ย', 'เชี้ย', 'สัส', 'ควย', 'เย็ด', 'แม่ง', 'แม่มึง', 'พ่อมึง', 'มึง', 'ไอ้สัตว์', 'อีสัตว์', 'ไอ้เวร', 'อีเวร', 'ไอ้ควาย', 'อีควาย', 'อีดอก', 'ดอกทอง',
+  'ระยำ', 'ชาติหมา', 'ส้นตีน', 'ตีนมึง', 'จัญไร', 'กะหรี่', 'ร่าน', 'ไอ้ฟาย', 'อีฟาย', 'ไอ้บ้า', 'อีบ้า', 'ไอ้โง่', 'อีโง่', 'ไอ้หน้าโง่', 'สถุน', 'ไพร่', 'ปัญญาอ่อน', 'อีห่า', 'ไอ้ห่า', 'ห่าราก', 'ห่าเหว', 'แตด', 'จู๋', 'จิ๋ม'];
+const RUDE_RE = [/หี(?!บ)/, /สัด(?!ส่วน)/, /(^|[^ก-๙])เวร(?!กร)/];   // คำที่ซ้อนอยู่ในคำปกติ ต้องกันไว้ เช่น หีบ, สัดส่วน
+const RUDE_EN = /\b(fuck\w*|f+u+c+k+|shit\w*|bitch\w*|asshole|bastard|dick|cunt|motherfucker|wtf|stfu|damn|crap|slut|whore)\b/i;
+const RUDE_N = RUDE.map(norm);
+export const isRude = (t) => { if (!t) return false; const x = norm(t); return RUDE_N.some((w) => x.includes(w)) || RUDE_RE.some((r) => r.test(x)) || RUDE_EN.test(t); };

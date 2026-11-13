@@ -11,13 +11,16 @@ const COVER = Object.fromEntries(Object.entries(import.meta.glob('../art/covers/
 import { audio } from '../lib/audio.js';
 import { REDUCE, clamp, param } from '../lib/util.js';
 import { createRain } from '../lib/rain.js';
-import { TOPICS, RAIN, SONGS, MOODS, pickTrack, TRACKS, HEART, ACTION, batteryReply, pickMood, LINKS, isRisk } from './shopdata.js';
+import { TOPICS, RAIN, SONGS, MOODS, pickTrack, TRACKS, HEART, ACTION, batteryReply, pickMood, LINKS, isRisk, isRude } from './shopdata.js';
 import { saveReceipt } from './receipt-image.js';
 import walkSvg from '../art/shop/src-svg/m-walk.svg?raw';
 // ท่าเดิน: ใช้ SVG ตัวจริงเพื่อขยับขาได้ (2 path แรกในไฟล์คือขา)
 const WALK = walkSvg.replace(/<svg[^>]*>/, (t) => t.replace(/ width="[^"]*"| height="[^"]*"/g, '')).replace('<path ', '<path class="leg leg1" ').replace(/(<path class="leg leg1"[^>]*>[\s\S]*?)<path /, '$1<path class="leg leg2" ');
 
 const POSE_URL = import.meta.glob('../art/shop/m-*.webp', { eager: true, query: '?url', import: 'default' });
+const MASK_URL = import.meta.glob('../art/shop/m-*-mask.png', { eager: true, query: '?url', import: 'default' });
+// ท่าถือแผ่นเสียง: มุมของปกในภาพ (พิกัดภาพกว้าง 880) → วางปกของมู้ดลงบนแผ่นที่ถือ (มือยังอยู่ด้านหน้าเพราะใช้มาสก์เฉพาะพื้นที่ปก)
+const HELD = { found1: [[379, 555], [655, 557], [376, 823]], found2: [[401, 410], [740, 472], [345, 749]] };
 // ท่า: [กว้างในฉาก, สัดส่วนสูง/กว้างของไฟล์, จุดยืน x (0..1), จุดยืน y (0..1)]
 // จุดยืน y = ตำแหน่งเท้าในไฟล์ (วัดจากภาพจริง) เพื่อให้เท้าแตะพื้นพอดี ไม่ลอย/ไม่จม
 // ขนาด/จุดกึ่งกลาง ปรับให้หัวมาสคอตกว้างเท่ากันทุกท่า (วัดจากภาพ) และกึ่งกลางหัวอยู่จุดเดียวกัน → ตอนเฟดเปลี่ยนท่าตัวซ้อนกันพอดี ไม่เลื่อน
@@ -43,7 +46,7 @@ export function createShopFlow({ onExit } = {}) {
       <img class="sf-scene" src="${sceneUrl}" alt="" draggable="false">
       <div class="sf-desk" id="desk"></div><div class="sf-notes" id="notes"></div>
       <img class="sf-sit" id="sitimg" src="${POSE_URL['../art/shop/m-sit.webp']}" alt="" draggable="false">
-      <div class="sf-masc" id="masc"><i class="sf-shadow"></i><div class="sf-body" id="body">${Object.keys(POSE).filter((k) => k !== 'sit').map((k) => k === 'walk' ? `<div class="svgp" data-p="walk">${WALK}</div>` : `<img data-p="${k}" src="${POSE_URL[`../art/shop/m-${k}.webp`]}" alt="" draggable="false">`).join('')}</div></div>
+      <div class="sf-masc" id="masc"><i class="sf-shadow"></i><div class="sf-body" id="body">${Object.keys(POSE).filter((k) => k !== 'sit').map((k) => k === 'walk' ? `<div class="svgp" data-p="walk">${WALK}</div>` : HELD[k] ? `<div class="svgp held" data-p="${k}"><img src="${POSE_URL[`../art/shop/m-${k}.webp`]}" alt="" draggable="false"><i class="cvw" style="-webkit-mask-image:url(${MASK_URL[`../art/shop/m-${k}-mask.png`]});mask-image:url(${MASK_URL[`../art/shop/m-${k}-mask.png`]})"><img class="cv" alt="" draggable="false"></i></div>` : `<img data-p="${k}" src="${POSE_URL[`../art/shop/m-${k}.webp`]}" alt="" draggable="false">`).join('')}</div></div>
     </div><canvas class="sf-rainc" id="rainc"></canvas><div class="sf-dim" id="dim"></div></div>
     <button class="sf-help" id="help">อยากคุยกับใครสักคน</button>
     <div class="sf-bubble" id="bubble" aria-live="polite"><b>ooca:</b><p id="btext"></p></div>
@@ -87,7 +90,9 @@ export function createShopFlow({ onExit } = {}) {
     m.pose = p; m.flip = flip;   // ทิศหันเก็บไว้ที่แต่ละภาพ → ภาพเก่าที่กำลังจางไม่พลิกกลับ/วาป
     body.querySelectorAll('[data-p]').forEach((im) => { const on = im.dataset.p === p; im.classList.toggle('on', on); if (on) {
       const [w, r, ax, ay] = POSE[p], h = w * r, clip = 0;
-      im.style.cssText = `--flip:${flip};width:${w}px;left:${-w * (flip < 0 ? 1 - ax : ax)}px;top:${-h * ay}px;${clip ? `clip-path:inset(0 0 ${clip}px 0)` : ''}`; }});
+      im.style.cssText = `--flip:${flip};width:${w}px;left:${-w * (flip < 0 ? 1 - ax : ax)}px;top:${-h * ay}px;${clip ? `clip-path:inset(0 0 ${clip}px 0)` : ''}`;
+      const q = HELD[p], cv = q && im.querySelector('.cv'); if (cv) { const k = w / 880, H = 880 * 86 / 89, [[x0, y0], [x1, y1], [x2, y2]] = q;
+        cv.style.transform = `matrix(${(x1 - x0) / 880},${(y1 - y0) / 880},${(x2 - x0) / H},${(y2 - y0) / H},${x0 * k},${y0 * k})`; } }});
     sitImg.classList.toggle('on', p === 'sit');   // ภาพนั่งหลังเคาน์เตอร์อยู่กับที่ในฉาก แค่เฟดเข้า/ออก
     body.classList.toggle('sit', p === 'sit'); placeBubble(500);
     const sw = POSE[p][0] * (FEET[p] || .3) * 1.35; Object.assign(shadow.style, { width: sw + 'px', height: sw * .2 + 'px', left: -sw / 2 + 'px', top: -sw * .1 + 'px' });
@@ -236,7 +241,7 @@ export function createShopFlow({ onExit } = {}) {
   }
 
   async function q4() {
-    await walkTo(770, 512, 'stand');
+    await walkTo(770, 512, 'stand'); audio.duck(0);   // ข้อ 4: เพลงร้านเฟดหาย ให้ได้ยินเสียงของแต่ละตัวเลือกชัดๆ
     setSheet({ cls: 'sf-q', back: true, hint: 'เลือกได้ 2 ข้อ', html: `<div class="sf-opts" id="opts">${SONGS.map((s, i) => `<button class="sf-opt" data-i="${i}" style="--c:${s.c}" aria-pressed="${st.songs.includes(i)}"><i class="v"></i><span>${s.label}</span><i class="ck"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></i></button>`).join('')}</div>`, btn: '', skip: 'ข้ามข้อนี้' });
     setBtn('ไปต่อ 4/5', st.songs.length > 0); say('ถ้าสมมติว่าชีวิตของคุณตอนนี้เป็นเพลง\nจะเป็นเพลงแนวไหนครับ'); const my = run;
     dyn.querySelector('#opts').onclick = (e) => {
@@ -245,14 +250,16 @@ export function createShopFlow({ onExit } = {}) {
       else { if (st.songs.length >= 2) { const old = st.songs.shift(); dyn.querySelector(`.sf-opt[data-i="${old}"]`).setAttribute('aria-pressed', 'false'); } st.songs.push(i); audio.vibe(i); say(SONGS[i].say); }
       b.setAttribute('aria-pressed', String(st.songs.includes(i))); pose(st.songs.length ? 'listen' : 'stand'); if (st.songs.includes(i)) hop(); setBtn('ไปต่อ 4/5', st.songs.length > 0);
     };
-    const res = await press(); if (res === 'skip') st.songs = []; return res;
+    const res = await press(); audio.duck(1); if (res === 'skip') st.songs = []; return res;
   }
 
   async function q5() {
     await walkTo(950, 512, 'stand');
     setSheet({ cls: 'sf-q', back: true, hint: 'ฝากไว้ในกระดาษโน้ต', html: `<label class="sf-note"><textarea id="note" rows="3" placeholder="พิมพ์ตรงนี้ หรือข้ามไปก็ได้" aria-label="ข้อความฝากถึง ooca"></textarea><span id="cnt">0/80</span></label>`, btn: 'ค้นหาเพลง' });
     say('มีอะไรอยากฝากไว้กับผมไหม\nเขียนสั้นๆ ก็ได้'); const ta = dyn.querySelector('#note');
-    ta.oninput = () => { let g = graphemes(ta.value.replace(/\n{2,}/g, '\n')); if (g.length > 80) { g = g.slice(0, 80); ta.value = g.join(''); } dyn.querySelector('#cnt').textContent = g.length + '/80'; audio.fx('type'); };
+    const hint = dyn.querySelector('#hint');
+    ta.oninput = () => { let g = graphemes(ta.value.replace(/\n{2,}/g, '\n')); if (g.length > 80) { g = g.slice(0, 80); ta.value = g.join(''); } dyn.querySelector('#cnt').textContent = g.length + '/80'; audio.fx('type');
+      const rude = !isRisk(ta.value) && isRude(ta.value); hint.textContent = rude ? 'ขอเป็นคำที่สุภาพขึ้นอีกนิดนะครับ' : 'ฝากไว้ในกระดาษโน้ต'; hint.classList.toggle('warn', rude); setBtn('ค้นหาเพลง', !rude); };   // คำหยาบ → ยังส่งไม่ได้ (คำเสี่ยงส่งได้เสมอ เพื่อพาไปหน้าดูแล)
     if (st.note) { ta.value = st.note; ta.oninput(); }
     ta.onfocus = () => setTimeout(() => layout(400), 380);
     const res = await press(); st.note = ta.value.trim(); ta.blur(); if (res === 'back') return res;
@@ -262,7 +269,7 @@ export function createShopFlow({ onExit } = {}) {
   }
 
   async function findSong() {
-    st.mood = pickMood(st); st.track = pickTrack(st.mood); setSheet({ hint: 'กำลังค้นหาเพลง' }); cam.boost = 1.05; await walkTo(459, 505, 'find');
+    st.mood = pickMood(st); st.track = pickTrack(st.mood); body.querySelectorAll('.cv').forEach((c) => { c.src = COVER[st.mood]; }); setSheet({ hint: 'กำลังค้นหาเพลง' }); cam.boost = 1.05; await walkTo(459, 505, 'find');
     say('ผมจะหาเพลง\nที่เหมาะกับอารมณ์คุณช่วงนี้ให้นะ'); for (let i = 0; i < 4; i++) { await wait(900); audio.fx('rummage'); hop(); }
     pose('found1'); hop(); audio.fx('found'); await say('ผมเจอแล้ว ไปฟังเพลงกันนะ', { hold: 1500 });
     cam.boost = 1.12; await walkTo(742, 470, 'found2');
@@ -313,10 +320,16 @@ export function createShopFlow({ onExit } = {}) {
     for (;;) { const r = await press(); if (r === 'done') break; if (r === 'save') { const url = await saveReceipt(data).catch(() => null); if (url) { openModal(`<div class="sf-saved"><img src="${url}" alt="ใบเสร็จของคุณ"><p>กดค้างที่รูปเพื่อบันทึก หรือกดดาวน์โหลด<br>รูปนี้อยู่ในเครื่องของคุณเท่านั้น</p><a class="sf-btn ready" href="${url}" download="ooca-receipt.png">ดาวน์โหลด</a><button class="sf-btn ghost" data-x>ปิด</button></div>`); } } }
   }
 
+  // ค่อยๆ ปรับเสียงเพลง SoundCloud (0–100)
+  function fadeWidget(to, ms = 1500) { return new Promise((res) => { if (!widget) return res(); widget.getVolume((v0) => { const t0 = performance.now(); const step = () => { const k = Math.min(1, (performance.now() - t0) / ms); try { widget.setVolume(v0 + (to - v0) * k); } catch (e) {} k < 1 ? requestAnimationFrame(step) : res(); }; step(); }); }); }
   async function bye() {
-    try { widget?.pause(); } catch (e) {} setPlaying(false); el.classList.remove('needle'); embed.hidden = true; embed.classList.remove('slim'); top.innerHTML = ''; audio.music(true);
-    setSheet({}); cam.boost = 1; pose('wave'); hop(); audio.fx('bye'); el.classList.add('warm');
-    await say('ฝนหยุดเมื่อไหร่\nก็กลับมาได้เสมอนะครับ', { hold: 1200 }); setBtn('กลับไปที่หน้าแรก'); await press();
+    // เพลงที่ฟังอยู่เล่นต่อเบาๆ จนกดกลับหน้าแรก (ถ้าไม่ได้เล่นอยู่ → ใช้เพลงในร้านตามเดิม)
+    embed.hidden = true; embed.classList.remove('slim'); top.innerHTML = '';
+    if (playing) fadeWidget(35, 2000); else { el.classList.remove('needle'); audio.music(true); }
+    setSheet({ skip: playing ? 'หยุดเพลง' : '' }); cam.boost = 1; pose('wave'); hop(); audio.fx('bye'); el.classList.add('warm');
+    await say('ฝนหยุดเมื่อไหร่\nก็กลับมาได้เสมอนะครับ', { hold: 1200 }); setBtn('กลับไปที่หน้าแรก');
+    for (;;) { const r = await press(); if (r !== 'skip') break; try { widget?.pause(); } catch (e) {} setPlaying(false); dyn.querySelector('#sfskip')?.remove(); audio.music(true); }
+    if (playing) { await fadeWidget(0, 1400); } try { widget?.pause(); } catch (e) {} setPlaying(false); el.classList.remove('needle'); try { widget?.setVolume(100); } catch (e) {}
     Object.assign(st, { topics: [], rain: null, battery: null, songs: [], note: '', heavy: false, mood: null }); onExit?.();
   }
 
@@ -347,7 +360,7 @@ export function createShopFlow({ onExit } = {}) {
     const LOADING = new Map([[q1, 'ooca กำลังเก็บกระดาษให้'], [q2, 'กำลังฟังเรื่องฝนของคุณ'], [q3, 'กำลังชาร์จแบตใจ'], [q4, 'กำลังเลือกจังหวะเพลง'], [q5, 'กำลังอ่านโน้ตของคุณ']]);
     // ทดสอบเพลง: ?song=calm-1 → ข้ามไปหน้าเครื่องเล่นพร้อมเพลงนั้นเลย
     const sp = String(param('song', '')).match(/^(\w+)-(\d)$/);
-    if (sp && TRACKS[sp[1]]?.[+sp[2]]) { st.mood = sp[1]; st.track = TRACKS[sp[1]][+sp[2]]; m.x = 742; m.y = 470; placeMasc(0); pose('found2', 1); layout(0); from = seq.indexOf(player); }
+    if (sp && TRACKS[sp[1]]?.[+sp[2]]) { st.mood = sp[1]; st.track = TRACKS[sp[1]][+sp[2]]; body.querySelectorAll('.cv').forEach((c) => { c.src = COVER[st.mood]; }); m.x = 742; m.y = 470; placeMasc(0); pose('found2', 1); layout(0); from = seq.indexOf(player); }
     for (let i = from; i < seq.length; i++) {
       if (my !== run) return; const r = await seq[i](); if (my !== run) return; say.hide();
       if (Q.has(seq[i]) && r !== 'back') setSheet({ hint: LOADING.get(seq[i]) });   // กดตกลงแล้ว → ขึ้นสถานะกำลังดำเนินการ (แบบหน้าค้นหาเพลง)

@@ -190,12 +190,14 @@ const VIBE = [
   () => { [60, 62, 64, 67, 69, 72, 76].forEach((m, i) => v(m, i * .42, 1, .03 + i * .007)); chord([60, 64, 67, 72], 3, 2, .045, 'sine', .05); },   // ค่อยๆ ดีขึ้น
 ];
 export const audio = {
+  // ข้อ 4: เพลงร้านเฟดหาย (0) แล้วกลับมาเท่าเดิม (1) ตอนไปข้อ 5
+  duck(k) { if (!ctx || !M.bus || !M.on) return; const t = ctx.currentTime; M.bus.gain.cancelScheduledValues(t); M.bus.gain.setTargetAtTime(.9 * k, t, k ? 1.2 : .6); },
   vibe(i) {
     if (!ctx || !VIBE[i]) return; const t = ctx.currentTime;
     VB.nodes.forEach((o) => { try { o.stop(t + .08); } catch (e) {} }); VB.nodes = [];
-    vbus().gain.cancelScheduledValues(t); VB.g.gain.setValueAtTime(0, t); VB.g.gain.linearRampToValueAtTime(1, t + .1);   // ตัดวลีเก่านุ่มๆ
+    vbus().gain.cancelScheduledValues(t); VB.g.gain.setValueAtTime(0, t); VB.g.gain.linearRampToValueAtTime(2.4, t + .1);   // ดังขึ้นชัดๆ   // ตัดวลีเก่านุ่มๆ
     VIBE[i]();
-    if (M.bus) { M.bus.gain.cancelScheduledValues(t); M.bus.gain.setTargetAtTime(M.on ? .25 : 0, t, .3); clearTimeout(VB.t); VB.t = setTimeout(() => { if (M.on && M.bus) M.bus.gain.setTargetAtTime(.9, ctx.currentTime, 1.2); }, 4800); }   // เพลงร้านเบาลงระหว่างเล่น
+
   },
   get muted() { return muted; },
   unlock() { if (!init()) return; if (ctx.state === 'suspended') ctx.resume(); dropLoop(); },
