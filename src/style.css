@@ -196,7 +196,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hm-rain { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
 .hm-art { position: absolute; left: 0; top: calc(88px * var(--s)); width: calc(390px * var(--s)); animation: hmin 1.4s ease .1s both; }
 .hm-art svg { display: block; width: 100%; height: auto; }
-.hm-logo { position: absolute; left: calc(78px * var(--s)); top: calc(505px * var(--s)); width: calc(236px * var(--s)); animation: hmin 1.2s ease .5s both; } .hm-logo svg { display: block; width: 100%; height: auto; }
+.hm-logo { position: absolute; left: calc(79px * var(--s)); top: calc(496px * var(--s)); width: calc(232px * var(--s)); animation: hmin 1.2s ease .5s both; } .hm-logo svg { display: block; width: 100%; height: auto; }
 .hm-title { position: absolute; left: 0; right: 0; top: calc(584px * var(--s)); text-align: center; font-weight: 500; font-size: calc(18px * var(--s)); line-height: 1.4; animation: hmin 1.2s ease .7s both; }
 .hm-copy { position: absolute; left: 0; right: 0; top: calc(614px * var(--s)); text-align: center; font-weight: 500; font-size: calc(15px * var(--s)); line-height: 1.6; color: #fff; text-shadow: 0 1px 2px rgba(0, 70, 70, .25); animation: hmin 1.2s ease .8s both; }
 .hm-btn { position: absolute; left: calc(24px * var(--s)); width: calc(342px * var(--s)); top: calc(703px * var(--s)); height: calc(53px * var(--s)); border-radius: calc(24px * var(--s)); background: #fff; color: #1FA89A; font-weight: 600; font-size: calc(16px * var(--s)); box-shadow: 0 4px 14px rgba(0, 60, 60, .2); transition: transform .2s, filter .2s; animation: hmin 1.2s ease 1s both, hmpulse 2.8s ease-in-out 2.5s infinite; }
@@ -211,9 +211,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* หน้าเตือนใส่หูฟัง (ทับบนฉาก 1 ก่อนเริ่ม) */
 .hp { position: absolute; inset: 0; z-index: 40; background: rgba(10, 16, 20, .9); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(10 * var(--u)); text-align: center; color: #fff; opacity: 0; visibility: hidden; transition: opacity 1s ease, visibility 0s linear 1s; padding: 0 calc(24 * var(--u)); }
 .hp.on { opacity: 1; visibility: visible; transition: opacity 1s ease; }
-.hp svg { width: calc(64 * var(--u)); height: calc(64 * var(--u)); fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; margin-bottom: calc(10 * var(--u)); animation: hpbob 3s ease-in-out infinite; }
+.hp-ic { display: flex; gap: calc(18 * var(--u)); margin-bottom: calc(10 * var(--u)); }
+.hp-ic svg { width: calc(46 * var(--u)); height: calc(46 * var(--u)); animation: hpbob 3s ease-in-out infinite; } .hp-ic svg + svg { animation-delay: -1.5s; }
 @keyframes hpbob { 50% { transform: translateY(-4px); } }
 .hp b { font-weight: 500; font-size: calc(17 * var(--u)); } .hp p { font-size: calc(14 * var(--u)); line-height: 1.6; color: rgba(255, 255, 255, .72); }
 .hp small { position: absolute; bottom: calc(60 * var(--u) + env(safe-area-inset-bottom, 0px)); font-size: calc(14 * var(--u)); color: rgba(255, 255, 255, .55); animation: hppulse 2.4s ease-in-out infinite; }
 @keyframes hppulse { 50% { opacity: .4; } }
-.screen.notice .back, .screen.notice .skip, .screen.notice .hint { opacity: 0 !important; pointer-events: none; }
+.screen.notice .back, .screen.notice .skip, .screen.notice .hint, .screen.notice .copy { opacity: 0 !important; pointer-events: none; }   /* ข้อความฉาก 1 ยังไม่ขึ้นจนกว่าจะแตะปิด */

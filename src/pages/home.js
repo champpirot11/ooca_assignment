@@ -64,6 +64,7 @@ export function createHome({ onEnter }) {
     for (const p of drips) { cf.fillStyle = 'rgba(220,255,250,.85)'; cf.beginPath(); cf.ellipse(p.x, p.y + 3, 1.9, 2.8 + Math.min(4, p.v / 260), 0, 0, Math.PI * 2); cf.fill(); }
   }
   el.querySelector('#hmgo').addEventListener('click', () => onEnter());
+  if (window.ResizeObserver) new ResizeObserver(() => layout()).observe(el);   // จัดกลางใหม่ทุกครั้งที่ขนาดจอเปลี่ยน (เดสก์ท็อป/หมุนจอ)
   return {
     el,
     show() { el.classList.remove('instant'); el.classList.add('on'); layout(); },
