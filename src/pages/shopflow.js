@@ -9,9 +9,9 @@ import logoUrl from '../art/shop/ooca-logo.svg?url';
 // ปกแผ่นเสียง 8 มู้ด (ออกแบบโดย Panupong) — ชื่อไฟล์ cover-<มู้ด>.svg
 const COVER = Object.fromEntries(Object.entries(import.meta.glob('../art/covers/cover-*.svg', { eager: true, query: '?url', import: 'default' })).map(([k, v]) => [k.match(/cover-(\w+)\.svg/)[1], v]));
 import { audio } from '../lib/audio.js';
-import { REDUCE, clamp } from '../lib/util.js';
+import { REDUCE, clamp, param } from '../lib/util.js';
 import { createRain } from '../lib/rain.js';
-import { TOPICS, RAIN, SONGS, MOODS, pickTrack, HEART, ACTION, batteryReply, pickMood, LINKS, isRisk } from './shopdata.js';
+import { TOPICS, RAIN, SONGS, MOODS, pickTrack, TRACKS, HEART, ACTION, batteryReply, pickMood, LINKS, isRisk } from './shopdata.js';
 import { saveReceipt } from './receipt-image.js';
 import walkSvg from '../art/shop/src-svg/m-walk.svg?raw';
 // ท่าเดิน: ใช้ SVG ตัวจริงเพื่อขยับขาได้ (2 path แรกในไฟล์คือขา)
@@ -344,6 +344,9 @@ export function createShopFlow({ onExit } = {}) {
     const my = ++run; alive = true; el.classList.add('on'); el.classList.remove('warm', 'needle', 'playing'); $('#desk').innerHTML = ''; embed.hidden = true; top.innerHTML = ''; audio.scene('shop'); audio.room(.45, 1500); nudge();
     const gate = async () => { if (!st.heavy && st.battery !== null && (st.battery <= 10 || (st.battery <= 20 && RAIN[st.rain]?.storm))) await danger(); };
     const seq = [intro, q1, q2, q3, gate, q4, q5, findSong, player, receipt, bye], Q = new Set([q1, q2, q3, q4, q5]);
+    // ทดสอบเพลง: ?song=calm-1 → ข้ามไปหน้าเครื่องเล่นพร้อมเพลงนั้นเลย
+    const sp = String(param('song', '')).match(/^(\w+)-(\d)$/);
+    if (sp && TRACKS[sp[1]]?.[+sp[2]]) { st.mood = sp[1]; st.track = TRACKS[sp[1]][+sp[2]]; m.x = 742; m.y = 470; placeMasc(0); pose('found2', 1); layout(0); from = seq.indexOf(player); }
     for (let i = from; i < seq.length; i++) {
       if (my !== run) return; const r = await seq[i](); if (my !== run) return; say.hide(); dyn.classList.add('locked');
       if (r === 'back') { let j = i - 1; while (j > 0 && !Q.has(seq[j])) j--; i = j - 1; }   // ย้อนไปข้อก่อนหน้า (คำตอบเดิมยังอยู่)

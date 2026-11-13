@@ -72,7 +72,7 @@ $('skip').addEventListener('click', () => { if (cur < LAST) go(LAST); });
 const talk = createShopFlow({ onExit: leaveShop }); screenEl.appendChild(talk.el);
 // หน้าแรก: กดปุ่ม = ปลดล็อกเสียง แล้วเริ่มบทเกริ่นฉาก 1 พร้อมเสียงฝน
 const home = createHome({ onEnter: () => { audio.unlock(); home.hide(); resetPrologue(); go(0); } }); screenEl.appendChild(home.el); home.mount();
-const startHome = !(param('step', 0) || param('talk', 0)); if (!startHome) home.hide();
+const startHome = !(param('step', 0) || param('talk', 0) || param('song', 0)); if (!startHome) home.hide();
 function resetPrologue() { Object.values(pages).forEach((p) => { p.el.classList.remove('on'); p.leave?.(); }); copyEls.forEach((c) => c.classList.remove('on')); hint.classList.remove('on'); cta.classList.remove('on'); clearTimeout(hintTimer); cur = -1; }
 function leaveShop() { talk.stop(); screenEl.classList.remove('in-shop'); resetPrologue(); home.show(); audio.scene('home'); }   // จบแล้วกลับหน้าแรก   // จบแล้วกลับหน้าแรก คำตอบถูกล้างแล้ว
 function enterShop(from = 0) { audio.unlock(); screenEl.classList.add('in-shop'); window.dispatchEvent(new CustomEvent('prologue:done')); talk.start(from); }
@@ -94,4 +94,4 @@ if (!startHome) go(Math.max(0, Math.min(LAST, +param('step', 1) - 1)));
 if (cur >= 0) { const t = +param('t', 0); const p = pages[STEPS[cur].page]; for (let k = 0; k < t * 60; k++) p.tick(1 / 60); }   // ?step=3&t=5 ข้ามไปดูช่วงนั้นเลย (ไว้ทดสอบ)
 requestAnimationFrame(loop);
 window.__prologue = { go, pages, talk, enterShop };
-if (param('talk')) enterShop();   // ?talk=1 ข้ามไปฉากคุยเลย (ไว้ทดสอบ)
+if (param('talk') || param('song')) enterShop();   // ?talk=1 ข้ามไปฉากคุยเลย (ไว้ทดสอบ)
