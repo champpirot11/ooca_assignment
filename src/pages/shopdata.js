@@ -72,7 +72,7 @@ export const TRACKS = {
   ],
   intro: [
     { title: 'Holocene - Bon Iver (instrumental cover: rakaaart)', embed: SC('rakaaart/holocene'), meaning: 'บางครั้งการรู้สึกตัวเล็กๆ ก็ทำให้เรื่องในหัวเบาลง เราไม่จำเป็นต้องคิดให้จบทุกเรื่องในคืนนี้' },
-    { title: 'Anchor - Novo Amor', embed: SC('iamnovoamor/anchor'), meaning: 'ในวันที่ความคิดพัดไปมา หาอะไรสักอย่างไว้ยึด แค่ลมหายใจตัวเองก็ได้' },
+    { title: 'Anchor - Novo Amor (cover: eriohutomo)', embed: SC('eriohutomo/anchor-novo-amor-cover'), meaning: 'ในวันที่ความคิดพัดไปมา หาอะไรสักอย่างไว้ยึด แค่ลมหายใจตัวเองก็ได้' },
   ],
   still: [
     { title: 'Nuvole Bianche - Ludovico Einaudi (piano: Andrea Bernacca)', embed: SC('andrea-bernacca/ludovico-einaudi-nuvole'), meaning: 'ไม่ต้องคิด ไม่ต้องพูด ปล่อยให้เปียโนเล่นไป เหมือนมองเมฆค่อยๆ ลอยผ่าน' },
