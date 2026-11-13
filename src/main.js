@@ -75,7 +75,13 @@ const talk = createShopFlow({ onExit: leaveShop }); screenEl.appendChild(talk.el
 const blk = document.createElement('div'); blk.className = 'fadeblk'; screenEl.appendChild(blk);
 let entering = false;
 const home = createHome({ onEnter: () => { if (entering) return; entering = true; audio.unlock(); audio.scene('none'); blk.classList.add('on');
-  setTimeout(() => { home.hide(true); resetPrologue(); go(0); setTimeout(() => { blk.classList.remove('on'); entering = false; }, 350); }, 1300); } });
+  setTimeout(() => { home.hide(true); resetPrologue(); go(0); audio.scene('none'); hp.classList.add('on'); screenEl.classList.add('notice'); setTimeout(() => { blk.classList.remove('on'); entering = false; }, 350); }, 1300); } });
+// หน้าเตือนใส่หูฟัง: แตะแล้วข้อความจาง → ฉาก 1 เริ่มใหม่พร้อมเสียงฝนค่อยๆ ดังขึ้น
+const hp = document.createElement('div'); hp.className = 'hp'; hp.setAttribute('role', 'button'); hp.setAttribute('aria-label', 'แตะเพื่อเริ่ม');
+hp.innerHTML = `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 30v-6a16 16 0 0132 0v6"/><rect x="6" y="28" width="8" height="13" rx="3"/><rect x="34" y="28" width="8" height="13" rx="3"/></svg>
+  <b>ใส่หูฟังไว้จะดีที่สุด</b><p>ใช้เวลาประมาณ 5–10 นาที<br>ข้อมูลทุกอย่างอยู่ในเครื่องคุณเท่านั้น ไม่ถูกส่งไปไหน</p><small>แตะเพื่อไปต่อ</small>`;
+screenEl.appendChild(hp);
+hp.addEventListener('click', (e) => { e.stopPropagation(); if (!hp.classList.contains('on')) return; audio.unlock(); hp.classList.remove('on'); screenEl.classList.remove('notice'); resetPrologue(); go(0); });
 screenEl.appendChild(home.el); home.mount();
 // หน้าแรก: แตะตรงไหนก็ได้ครั้งแรก = เปิดเสียงฝนข้างนอก + เพลงในร้าน (เบราว์เซอร์ไม่ให้เล่นเสียงก่อนแตะ)
 home.el.addEventListener('pointerdown', () => { if (entering || !home.on) return; audio.unlock(); if (!home.heard) { home.heard = true; audio.scene('home'); } }, { capture: true });
