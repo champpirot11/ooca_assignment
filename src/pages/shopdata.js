@@ -54,41 +54,41 @@ export function pickMood(st) {
   return mood;
 }
 
-// เพลง — มู้ดละ 2 เพลง (ไฟล์ทางการของศิลปิน/ค่ายบน SoundCloud) ระบบสุ่ม 1 เพลงจากมู้ดที่ได้
+// เพลง — มู้ดละ 2 เพลง ใช้เวอร์ชันคัฟเวอร์/อินดี้ที่ศิลปินอัปโหลดเอง (ไฟล์ของค่ายใหญ่ถูกบล็อกในไทย หรือเล่นได้แค่ 30 วิ) ระบบสุ่ม 1 เพลงจากมู้ดที่ได้
 // ความหมาย = ถ้อยคำของเราเอง ไม่ได้ยกเนื้อเพลงมา
 const SC = (path) => `https://w.soundcloud.com/player/?url=${encodeURIComponent('https://soundcloud.com/' + path)}&color=%2300c4b3&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false`;
 export const TRACKS = {
   release: [
-    { title: 'Shake It Out - Florence + The Machine', embed: SC('florence-the-machine/shake-it-out-acoustic'), meaning: 'บางวันเราแบกอะไรไว้เยอะจนลืมไปว่าวางลงได้ ลองสลัดมันออกสักหน่อย แล้วค่อยเริ่มใหม่' },
-    { title: 'Your Hand In Mine - Explosions In the Sky', embed: SC('explosionsinthesky/your-hand-in-mine-2'), meaning: 'ไม่ต้องมีคำพูดก็ได้ ปล่อยให้เสียงดนตรีพาความอัดอั้นออกไป แล้วค่อยๆ เบาลงไปพร้อมกัน' },
+    { title: 'Shake It Out - Florence + The Machine (cover: CARRON)', embed: SC('carronmusic/shake-it-out'), meaning: 'บางวันเราแบกอะไรไว้เยอะจนลืมไปว่าวางลงได้ ลองสลัดมันออกสักหน่อย แล้วค่อยเริ่มใหม่' },
+    { title: 'Your Hand In Mine - Explosions In the Sky (cover: Off by Two)', embed: SC('offbytwo/your-hand-in-mine-explosions'), meaning: 'ไม่ต้องมีคำพูดก็ได้ ปล่อยให้เสียงดนตรีพาความอัดอั้นออกไป แล้วค่อยๆ เบาลงไปพร้อมกัน' },
   ],
   cathartic: [
-    { title: 'All I Want - Kodaline', embed: SC('kodaline/all-i-want-1'), meaning: 'การคิดถึงใครสักคนจนเจ็บ แปลว่าใจเราเคยรักจริง ร้องไห้ออกมาได้นะ' },
-    { title: 'Skinny Love - Birdy', embed: SC('officialbirdy/birdy-skinny-love'), meaning: 'ความเศร้าบางอย่างไม่ต้องรีบหาย ปล่อยให้มันอยู่สักพัก แล้วมันจะเบาลงเอง' },
+    { title: 'All I Want - Kodaline (cover: Chris Lanzon)', embed: SC('chrislanzonmusic/alliwant'), meaning: 'การคิดถึงใครสักคนจนเจ็บ แปลว่าใจเราเคยรักจริง ร้องไห้ออกมาได้นะ' },
+    { title: 'Skinny Love - Bon Iver (cover: Georgia Kinahan)', embed: SC('georgiakinahan/skinny-love-bon-iver-birdy'), meaning: 'ความเศร้าบางอย่างไม่ต้องรีบหาย ปล่อยให้มันอยู่สักพัก แล้วมันจะเบาลงเอง' },
   ],
   nostalgia: [
-    { title: 'Somewhere Only We Know - Keane', embed: SC('keanemusic/somewhere-only-we-know'), meaning: 'ที่ที่เคยอบอุ่นยังอยู่ในใจเราเสมอ กลับไปคิดถึงได้ทุกเมื่อที่เหนื่อย' },
-    { title: 'Yellow - Coldplay', embed: SC('coldplay/yellow'), meaning: 'มีใครบางคนมองเห็นแสงในตัวคุณเสมอ แม้ในวันที่คุณมองไม่เห็นมันเอง' },
+    { title: 'Somewhere Only We Know - Keane (cover: Simply Three)', embed: SC('simplythree/somewhere-only-we-know-keane'), meaning: 'ที่ที่เคยอบอุ่นยังอยู่ในใจเราเสมอ กลับไปคิดถึงได้ทุกเมื่อที่เหนื่อย' },
+    { title: 'Yellow - Coldplay (cover: Archelle)', embed: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A478672074&color=%2300c4b3&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false', meaning: 'มีใครบางคนมองเห็นแสงในตัวคุณเสมอ แม้ในวันที่คุณมองไม่เห็นมันเอง' },
   ],
   intro: [
-    { title: 'Holocene - Bon Iver', embed: SC('jagjaguwar/bon-iver-holocene'), meaning: 'บางครั้งการรู้สึกตัวเล็กๆ ก็ทำให้เรื่องในหัวเบาลง เราไม่จำเป็นต้องคิดให้จบทุกเรื่องในคืนนี้' },
+    { title: 'Holocene - Bon Iver (instrumental cover: rakaaart)', embed: SC('rakaaart/holocene'), meaning: 'บางครั้งการรู้สึกตัวเล็กๆ ก็ทำให้เรื่องในหัวเบาลง เราไม่จำเป็นต้องคิดให้จบทุกเรื่องในคืนนี้' },
     { title: 'Anchor - Novo Amor', embed: SC('iamnovoamor/anchor'), meaning: 'ในวันที่ความคิดพัดไปมา หาอะไรสักอย่างไว้ยึด แค่ลมหายใจตัวเองก็ได้' },
   ],
   still: [
-    { title: 'Nuvole Bianche - Ludovico Einaudi', embed: SC('ludovicoeinaudi/nuvole-bianche-remastered-2020'), meaning: 'ไม่ต้องคิด ไม่ต้องพูด ปล่อยให้เปียโนเล่นไป เหมือนมองเมฆค่อยๆ ลอยผ่าน' },
-    { title: 'saman - Ólafur Arnalds', embed: SC('olafur-arnalds/saman-sunrise-session-ii'), meaning: 'ความเงียบก็เป็นที่พักได้ อยู่ตรงนี้เฉยๆ สักพักก็พอ' },
+    { title: 'Nuvole Bianche - Ludovico Einaudi (piano: Andrea Bernacca)', embed: SC('andrea-bernacca/ludovico-einaudi-nuvole'), meaning: 'ไม่ต้องคิด ไม่ต้องพูด ปล่อยให้เปียโนเล่นไป เหมือนมองเมฆค่อยๆ ลอยผ่าน' },
+    { title: 'saman - Ólafur Arnalds (harp: Abigail Brower)', embed: SC('abrowerharpist/saman-by-olafur-arnalds'), meaning: 'ความเงียบก็เป็นที่พักได้ อยู่ตรงนี้เฉยๆ สักพักก็พอ' },
   ],
   calm: [
-    { title: 'Banana Pancakes - Jack Johnson', embed: SC('jackjohnsonmusic/banana-pancakes'), meaning: 'วันฝนตกก็ไม่ต้องรีบไปไหน อยู่ช้าๆ ทำอะไรง่ายๆ ให้ตัวเองบ้าง' },
-    { title: 'Show Me How - Men I Trust', embed: SC('men-i-trust/men-i-trust-show-me-how'), meaning: 'ค่อยๆ หายใจตามจังหวะเพลง ไหล่ตกลงนิดนึง ใจจะช้าลงตามมาเอง' },
+    { title: 'Banana Pancakes - Jack Johnson (cover: Nick Duke)', embed: SC('nickdukemusic/banana-pancakes-jack-johnson-cover'), meaning: 'วันฝนตกก็ไม่ต้องรีบไปไหน อยู่ช้าๆ ทำอะไรง่ายๆ ให้ตัวเองบ้าง' },
+    { title: "Don't Know Why - Norah Jones (cover: ruthdian)", embed: SC('ruthdian/norah-jones-dont-know-why'), meaning: 'ไม่ต้องรู้ทุกคำตอบตอนนี้ก็ได้ นั่งฟังเพลงช้าๆ แล้วให้ใจได้พักก่อน' },
   ],
   easy: [
-    { title: 'Lover Boy - Phum Viphurit', embed: SC('phumviphurit/lover-boy-a-colors-show'), meaning: 'ความสุขเล็กๆ ไม่ต้องมีเหตุผลก็ได้ วันนี้ใจเบาก็ปล่อยให้มันเบาไป' },
-    { title: 'Riptide - Vance Joy', embed: SC('vancejoy/02-riptide'), meaning: 'ชีวิตไม่ต้องเพอร์เฟกต์ก็สนุกได้ ฮัมเพลงไปเรื่อยๆ ไม่ต้องคิดมาก' },
+    { title: 'Lover Boy - Phum Viphurit (cover: mattjaudian)', embed: SC('mattjaudian/lover-boy-phum-viphuritacoustic-cover'), meaning: 'ความสุขเล็กๆ ไม่ต้องมีเหตุผลก็ได้ วันนี้ใจเบาก็ปล่อยให้มันเบาไป' },
+    { title: 'Riptide - Vance Joy (cover: Kira Alejandro)', embed: SC('kira-alejandro/riptide-vance-joy-cover'), meaning: 'ชีวิตไม่ต้องเพอร์เฟกต์ก็สนุกได้ ฮัมเพลงไปเรื่อยๆ ไม่ต้องคิดมาก' },
   ],
   uplift: [
-    { title: 'Fix You - Coldplay', embed: SC('coldplay/fix-you-1'), meaning: 'ในวันที่พยายามแล้วยังไม่ดีขึ้น จะมีแสงพาคุณกลับบ้านเสมอ ไม่ต้องรีบหายดีในวันเดียว' },
-    { title: 'Keep Your Head Up - Ben Howard', embed: SC('benhowardofficial/keep-your-head-up'), meaning: 'เงยหน้าขึ้นนิดนึง ก้าวเล็กๆ วันนี้ก็คือการไปข้างหน้าแล้ว' },
+    { title: 'Fix You - Coldplay (cover: NEKA)', embed: SC('officialneka/fix-you-cover-coldplay'), meaning: 'ในวันที่พยายามแล้วยังไม่ดีขึ้น จะมีแสงพาคุณกลับบ้านเสมอ ไม่ต้องรีบหายดีในวันเดียว' },
+    { title: 'Keep Your Head Up - Ben Howard (cover: Coby Grant)', embed: SC('cobygrant/ben-howard-keep-your-head-up'), meaning: 'เงยหน้าขึ้นนิดนึง ก้าวเล็กๆ วันนี้ก็คือการไปข้างหน้าแล้ว' },
   ],
 };
 export const pickTrack = (mood) => { const L = TRACKS[mood] || TRACKS.calm; return L[Math.random() * L.length | 0]; };
