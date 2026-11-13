@@ -168,3 +168,7 @@
 @keyframes cvin { from { opacity: 0; transform: translateY(calc(8 * var(--u))) rotate(-6deg) scale(.9); } }
 .sf-paperr .r.cv { justify-content: flex-start; gap: calc(10 * var(--u)); } .sf-paperr .r.cv > span:last-child { margin-left: auto; }
 .sf-paperr .r.cv img { width: calc(40 * var(--u)); height: auto; max-width: none !important; flex: none; align-self: flex-start; }
+
+/* หน้าฟังเพลง: ความหมายเด่นกว่าชื่อเพลง */
+.sf-mean p.mn { color: #00897D; font-size: calc(17 * var(--u)); font-weight: 500; line-height: 1.6; margin: calc(4 * var(--u)) 0 calc(8 * var(--u)); }
+.sf-mean b.tt { color: #8d8d8d; font-size: calc(13 * var(--u)); font-weight: 400; line-height: 1.5; margin: 0; }

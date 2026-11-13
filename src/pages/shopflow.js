@@ -287,7 +287,7 @@ export function createShopFlow({ onExit } = {}) {
     setBtn(''); el.classList.add('needle'); await wait(1700); audio.fx('needle'); await wait(600);
     try { widget?.play(); } catch (e) {} setPlaying(true); audio.music(false); pose('listen'); hop(); cam.boost = 1;
     embed.hidden = false; top.classList.add('small');
-    dyn.insertAdjacentHTML('afterbegin', `<div class="sf-mean"><div class="sf-cv"><img src="${COVER[st.mood]}" alt="ปกแผ่น ${mood.th}"><span><small>แผ่นของคุณวันนี้</small><b class="mood">${mood.th}</b><i>${mood.en}</i></span></div><small>ความหมายจากเพลง</small><b>${esc(st.track.title)}</b><p>${esc(st.track.meaning)}</p></div>`);
+    dyn.insertAdjacentHTML('afterbegin', `<div class="sf-mean"><div class="sf-cv"><img src="${COVER[st.mood]}" alt="ปกแผ่น ${mood.th}"><span><small>แผ่นของคุณวันนี้</small><b class="mood">${mood.th}</b><i>${mood.en}</i></span></div><small>ความหมายจากเพลง</small><p class="mn">${esc(st.track.meaning)}</p><b class="tt">♪ ${esc(st.track.title)}</b></div>`);
     dyn.querySelector('#sfgo').insertAdjacentHTML('afterend', '<button class="sf-skip" id="sfskip">รับใบเสร็จ</button>'); say('ฟังไปด้วยกันนะครับ');
     setBtn('พักฟังเพลงสักแป๊บนะ', false); const my = run; setTimeout(() => { if (my === run && dyn.classList.contains('sf-player')) { setBtn('รับใบเสร็จ'); dyn.querySelector('#sfskip')?.remove(); } }, 10000);
     await press();
@@ -344,11 +344,14 @@ export function createShopFlow({ onExit } = {}) {
     const my = ++run; alive = true; el.classList.add('on'); el.classList.remove('warm', 'needle', 'playing'); $('#desk').innerHTML = ''; embed.hidden = true; top.innerHTML = ''; audio.scene('shop'); audio.room(.45, 1500); nudge();
     const gate = async () => { if (!st.heavy && st.battery !== null && (st.battery <= 10 || (st.battery <= 20 && RAIN[st.rain]?.storm))) await danger(); };
     const seq = [intro, q1, q2, q3, gate, q4, q5, findSong, player, receipt, bye], Q = new Set([q1, q2, q3, q4, q5]);
+    const LOADING = new Map([[q1, 'ooca กำลังเก็บกระดาษให้'], [q2, 'กำลังฟังเรื่องฝนของคุณ'], [q3, 'กำลังชาร์จแบตใจ'], [q4, 'กำลังเลือกจังหวะเพลง'], [q5, 'กำลังอ่านโน้ตของคุณ']]);
     // ทดสอบเพลง: ?song=calm-1 → ข้ามไปหน้าเครื่องเล่นพร้อมเพลงนั้นเลย
     const sp = String(param('song', '')).match(/^(\w+)-(\d)$/);
     if (sp && TRACKS[sp[1]]?.[+sp[2]]) { st.mood = sp[1]; st.track = TRACKS[sp[1]][+sp[2]]; m.x = 742; m.y = 470; placeMasc(0); pose('found2', 1); layout(0); from = seq.indexOf(player); }
     for (let i = from; i < seq.length; i++) {
-      if (my !== run) return; const r = await seq[i](); if (my !== run) return; say.hide(); dyn.classList.add('locked');
+      if (my !== run) return; const r = await seq[i](); if (my !== run) return; say.hide();
+      if (Q.has(seq[i]) && r !== 'back') setSheet({ hint: LOADING.get(seq[i]) });   // กดตกลงแล้ว → ขึ้นสถานะกำลังดำเนินการ (แบบหน้าค้นหาเพลง)
+      dyn.classList.add('locked');
       if (r === 'back') { let j = i - 1; while (j > 0 && !Q.has(seq[j])) j--; i = j - 1; }   // ย้อนไปข้อก่อนหน้า (คำตอบเดิมยังอยู่)
     }
   }

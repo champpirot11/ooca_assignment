@@ -163,20 +163,40 @@ function musicOn(on) {
   }
 }
 
-// ข้อ 4: เสียงสั้นๆ (ไม่ถึง 1 วิ) บุคลิกต่างกันตามแต่ละตัวเลือก (เรียงตาม SONGS)
+// ข้อ 4: วลีดนตรีสั้นๆ ~4–5 วิ บุคลิกต่างกันตามแต่ละตัวเลือก (เรียงตาม SONGS) · กดข้อใหม่ = วลีเก่าหยุด · เพลงร้านเบาลงระหว่างเล่น
 const N = (m) => 440 * Math.pow(2, (m - 69) / 12);
+const VB = { nodes: [], g: null, t: 0 };
+function vbus() {
+  if (VB.g) return VB.g;
+  const g = ctx.createGain(); g.gain.value = 1; const dl = ctx.createDelay(1); dl.delayTime.value = .32; const fb = ctx.createGain(); fb.gain.value = .28; const wet = ctx.createGain(); wet.gain.value = .25; const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2600;
+  g.connect(master); g.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(wet); wet.connect(master);
+  return (VB.g = g);
+}
+function v(m, at, dur, g, type = 'triangle', cut = 0) {   // โน้ตหนึ่งตัว: เข้าเร็ว ค่อยๆ จาง (คล้ายเปียโน/ระฆัง)
+  const t = ctx.currentTime + at, o = ctx.createOscillator(), ga = ctx.createGain(); o.type = type; o.frequency.value = typeof m === 'number' && m < 200 ? N(m) : m;
+  ga.gain.setValueAtTime(0, t); ga.gain.linearRampToValueAtTime(g, t + .015); ga.gain.exponentialRampToValueAtTime(g * .4, t + Math.min(.5, dur * .4)); ga.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  let last = ga; if (cut) { const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = cut; ga.connect(f); last = f; }
+  o.connect(ga); last.connect(vbus()); o.start(t); o.stop(t + dur + .05); VB.nodes.push(o);
+}
+const chord = (ms, at, dur, g, type, roll = .03) => ms.forEach((m, i) => v(m, at + i * roll, dur, g, type));
 const VIBE = [
-  () => [72, 76, 79, 84].forEach((m, i) => tone({ f: N(m), f2: N(m), dur: .32, g: .022, type: 'triangle', at: i * .07 })),                                   // สดใส: ไล่ขึ้นเร็วๆ
-  () => [65, 69, 72, 76].forEach((m, i) => tone({ f: N(m), f2: N(m), dur: .9, g: .016, type: 'sine', at: i * .11 })),                                         // ช้าๆ สบาย: คอร์ดนุ่มค่อยๆ ไล่
-  () => [57, 60, 64].forEach((m, i) => { tone({ f: N(m), f2: N(m) * .995, dur: .85, g: .02, type: 'triangle', at: i * .09 }); tone({ f: N(m) * 2, f2: N(m) * 2, dur: .4, g: .004, at: i * .09 }); }),   // เศร้า: คอร์ดไมเนอร์หม่น
-  () => tone({ f: N(84), f2: N(84), dur: .9, g: .01, type: 'sine' }),                                                                                           // เงียบๆ: โน้ตเดียวเบามาก
-  () => { tone({ f: 110, f2: 45, dur: .35, g: .08, type: 'sine' }); [40, 47, 52].forEach((m, i) => tone({ f: N(m), f2: N(m), dur: .6, g: .022, type: 'triangle', at: .04 + i * .03 })); },   // หนักๆ: ทุ้มหนัก
-  () => { [79, 76, 72, 74].forEach((m, i) => tone({ f: N(m), f2: N(m) * .997, dur: .45, g: .016, type: 'triangle', at: i * .13 })); },                         // คิดถึงวันเก่า: กล่องดนตรี
-  () => [64, 67, 71, 67, 64].forEach((m, i) => tone({ f: N(m), f2: N(m), dur: .2, g: .014, type: 'sine', at: i * .09 })),                                     // วนๆ คิดไม่หยุด: วนไปวนมา
-  () => [60, 62, 64, 67, 72].forEach((m, i) => tone({ f: N(m), f2: N(m), dur: .4, g: .01 + i * .003, type: 'triangle', at: i * .12 })),                       // ค่อยๆ ดีขึ้น: ก้าวขึ้นทีละขั้น
+  () => { [72, 76, 79, 84].forEach((m, i) => v(m, i * .12, .9, .07)); [79, 81, 79, 76, 77, 76, 72].forEach((m, i) => v(m, .7 + i * .3, .6, .06)); chord([60, 64, 67], .6, 3.6, .035, 'sine'); chord([65, 69, 72], 2.4, 2.2, .03, 'sine'); },   // สดใส
+  () => { chord([53, 57, 60, 64], 0, 2.6, .05, 'sine', .14); chord([48, 52, 55, 59], 2.2, 2.6, .05, 'sine', .14); v(69, .6, 1.6, .045, 'triangle'); v(67, 2.8, 1.8, .045, 'triangle'); },   // ช้าๆ สบาย
+  () => { chord([57, 60, 64], 0, 2.4, .05, 'triangle', .06); [76, 74, 72, 71].forEach((m, i) => v(m, .5 + i * .55, 1.1, .055)); chord([53, 57, 60], 2.4, 2.4, .045, 'triangle', .06); v(69, 3.4, 1.6, .05); },   // เศร้า
+  () => { v(88, 0, 2.6, .035, 'sine'); v(83, 1.9, 2.8, .028, 'sine'); v(76, 3.4, 1.6, .02, 'sine'); },   // เงียบๆ: เสียงระฆังห่างๆ
+  () => { [0, .5, .9, 1.25, 1.55].forEach((at) => { tone({ f: 120, f2: 42, dur: .4, g: .13, at }); [40, 47, 52].forEach((m) => v(m, at, .5, .05, 'sawtooth', 700)); }); [40, 47, 52, 55].forEach((m, i) => v(m, 2 + i * .02, 2.8, .05, 'sawtooth', 1100)); },   // หนักๆ ระบาย: ทุ้มหนักเร่งขึ้นแล้วปล่อย
+  () => { [79, 76, 72, 74, 76, 79, 81, 79].forEach((m, i) => v(N(m) * (1 + (Math.random() - .5) * .006), i * .45, 1.1, .05, 'triangle')); chord([48, 55, 64], 0, 3.8, .025, 'sine', .1); },   // คิดถึงวันเก่า: กล่องดนตรี
+  () => { for (let k = 0; k < 4; k++) [64, 67, 71, 67].forEach((m, i) => v(m, k * .95 + i * .23, .5, .045 - k * .006, 'sine')); chord([52, 59], 0, 4.2, .03, 'sine'); },   // วนๆ คิดไม่หยุด
+  () => { [60, 62, 64, 67, 69, 72, 76].forEach((m, i) => v(m, i * .42, 1, .03 + i * .007)); chord([60, 64, 67, 72], 3, 2, .045, 'sine', .05); },   // ค่อยๆ ดีขึ้น
 ];
 export const audio = {
-  vibe(i) { if (!ctx || muted) return; VIBE[i]?.(); },
+  vibe(i) {
+    if (!ctx || !VIBE[i]) return; const t = ctx.currentTime;
+    VB.nodes.forEach((o) => { try { o.stop(t + .08); } catch (e) {} }); VB.nodes = [];
+    vbus().gain.cancelScheduledValues(t); VB.g.gain.setValueAtTime(0, t); VB.g.gain.linearRampToValueAtTime(1, t + .1);   // ตัดวลีเก่านุ่มๆ
+    VIBE[i]();
+    if (M.bus) { M.bus.gain.cancelScheduledValues(t); M.bus.gain.setTargetAtTime(M.on ? .25 : 0, t, .3); clearTimeout(VB.t); VB.t = setTimeout(() => { if (M.on && M.bus) M.bus.gain.setTargetAtTime(.9, ctx.currentTime, 1.2); }, 4800); }   // เพลงร้านเบาลงระหว่างเล่น
+  },
   get muted() { return muted; },
   unlock() { if (!init()) return; if (ctx.state === 'suspended') ctx.resume(); dropLoop(); },
   setMuted(m) { muted = m; try { localStorage.setItem(KEY, m ? 'off' : 'on'); } catch (e) {} if (ctx) master.gain.setTargetAtTime(m ? 0 : 1, ctx.currentTime, .08); },
