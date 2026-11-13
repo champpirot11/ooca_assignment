@@ -200,6 +200,7 @@ export const audio = {
 
   },
   get muted() { return muted; },
+  get running() { return !!ctx && ctx.state === 'running'; },
   unlock() { if (!init()) return; if (ctx.state === 'suspended') ctx.resume(); dropLoop(); },
   setMuted(m) { muted = m; try { localStorage.setItem(KEY, m ? 'off' : 'on'); } catch (e) {} if (ctx) master.gain.setTargetAtTime(m ? 0 : 1, ctx.currentTime, .08); },
   music(on) { musicOn(on); },

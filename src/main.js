@@ -92,6 +92,12 @@ screenEl.appendChild(home.el); home.mount();
 // หน้าแรก: แตะตรงไหนก็ได้ครั้งแรก = เปิดเสียงฝนข้างนอก + เพลงในร้าน (เบราว์เซอร์ไม่ให้เล่นเสียงก่อนแตะ)
 home.el.addEventListener('pointerdown', () => { if (entering || !home.on) return; audio.unlock(); if (!home.heard) { home.heard = true; audio.scene('home'); } }, { capture: true });
 const startHome = !(param('step', 0) || param('talk', 0) || param('song', 0)); if (!startHome) home.hide();
+// หน้าแรกมีเสียงฝน + เพลงร้านเหมือนในร้าน: ลองเล่นทันที (บางเบราว์เซอร์อนุญาต) ถ้าถูกบล็อก เสียงจะขึ้นเองตอนแตะครั้งแรก + มีป้าย "แตะเพื่อเปิดเสียง" บอกไว้
+const snd = document.createElement('button'); snd.className = 'hm-snd'; snd.setAttribute('aria-label', 'แตะเพื่อเปิดเสียง');
+snd.innerHTML = `<svg aria-hidden="true" viewBox="0 0 45 45"><path fill="currentColor" d="M27.96 4.35c-.87-.87-2.38-.87-3.27 0L13.73 15.3H7.85a4.16 4.16 0 0 0-4.16 4.16v5.55a4.16 4.16 0 0 0 4.16 4.16h5.9l10.96 10.96a2.28 2.28 0 0 0 3.89-1.63V5.99c0-.63-.24-1.2-.68-1.64ZM25.87 7.14v30.24L15.3 26.8a1.4 1.4 0 0 0-.98-.4H7.85c-.76 0-1.38-.63-1.38-1.39v-5.54c0-.76.62-1.39 1.38-1.39h6.47c.37 0 .72-.15.98-.4L25.87 7.13ZM37.89 22.6c0-2.88-1.52-5.58-4.27-7.57a1.4 1.4 0 0 0-1.94.31 1.4 1.4 0 0 0 .31 1.94c2.02 1.46 3.14 3.36 3.14 5.34s-1.1 3.88-3.12 5.34a1.4 1.4 0 0 0-.31 1.94c.26.35.68.57 1.13.57.3 0 .57-.09.81-.26 2.74-2.01 4.25-4.71 4.25-7.61Z"/></svg><span>แตะเพื่อเปิดเสียง</span>`;
+home.el.appendChild(snd); snd.addEventListener('click', () => audio.unlock());
+if (startHome) { audio.unlock(); audio.scene('home'); home.heard = true; }
+setInterval(() => snd.classList.toggle('off', audio.running || audio.muted || !home.on), 300);
 function resetPrologue() { Object.values(pages).forEach((p) => { p.el.classList.remove('on'); p.leave?.(); }); copyEls.forEach((c) => c.classList.remove('on')); hint.classList.remove('on'); cta.classList.remove('on'); clearTimeout(hintTimer); cur = -1; }
 function leaveShop() { talk.stop(); screenEl.classList.remove('in-shop'); resetPrologue(); home.show(); home.heard = true; audio.scene('home'); }   // จบแล้วกลับหน้าแรก   // จบแล้วกลับหน้าแรก คำตอบถูกล้างแล้ว
 function enterShop(from = 0) { audio.unlock(); screenEl.classList.add('in-shop'); window.dispatchEvent(new CustomEvent('prologue:done')); talk.start(from); }

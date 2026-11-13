@@ -202,6 +202,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hm-btn { position: absolute; left: calc(24px * var(--s)); width: calc(342px * var(--s)); top: calc(703px * var(--s)); height: calc(53px * var(--s)); border-radius: calc(24px * var(--s)); background: #fff; color: #1FA89A; font-weight: 600; font-size: calc(16px * var(--s)); box-shadow: 0 4px 14px rgba(0, 60, 60, .2); transition: transform .2s, filter .2s; animation: hmin 1.2s ease 1s both, hmpulse 2.8s ease-in-out 2.5s infinite; }
 @keyframes hmpulse { 50% { box-shadow: 0 4px 24px rgba(255, 255, 255, .45); } }
 .hm-btn:active { transform: scale(.98); filter: brightness(.96); }
+.hm-snd { position: absolute; z-index: 3; top: calc(14px + env(safe-area-inset-top, 0px)); right: max(14px, env(safe-area-inset-right, 0px)); display: flex; align-items: center; gap: 6px; padding: 7px 13px 7px 10px; border-radius: 99px; background: rgba(255, 255, 255, .18); color: #fff; font: 500 13px/1 Prompt, sans-serif; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: opacity .6s, transform .6s; animation: hmin 1s ease 1.4s both; }
+.hm-snd svg { width: 18px; height: 18px; animation: hpbob 2.4s ease-in-out infinite; }
+.hm-snd.off { opacity: 0 !important; transform: translateY(-6px); pointer-events: none; }
 @keyframes hmin { from { opacity: 0; transform: translateY(10px); } }
 @media (prefers-reduced-motion: reduce) { .hm-art, .hm-logo, .hm-title, .hm-copy, .hm-btn { animation: none; } }
 .home.instant { transition: none; }
