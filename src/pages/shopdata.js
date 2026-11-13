@@ -54,12 +54,44 @@ export function pickMood(st) {
   return mood;
 }
 
-// เพลง (ตอนนี้ทดลอง 1 เพลง) — ใส่เพลงเพิ่มต่อมู้ดได้ภายหลัง
-export const TRACK = {
-  title: 'Yellow - Coldplay',
-  meaning: 'มีใครบางคนมองเห็นแสงในตัวคุณเสมอ แม้ในวันที่คุณมองไม่เห็นมันเอง',
-  embed: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A478672074&color=%2300c4b3&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false',
+// เพลง — มู้ดละ 2 เพลง (ไฟล์ทางการของศิลปิน/ค่ายบน SoundCloud) ระบบสุ่ม 1 เพลงจากมู้ดที่ได้
+// ความหมาย = ถ้อยคำของเราเอง ไม่ได้ยกเนื้อเพลงมา
+const SC = (path) => `https://w.soundcloud.com/player/?url=${encodeURIComponent('https://soundcloud.com/' + path)}&color=%2300c4b3&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false`;
+export const TRACKS = {
+  release: [
+    { title: 'Shake It Out - Florence + The Machine', embed: SC('florence-the-machine/shake-it-out-acoustic'), meaning: 'บางวันเราแบกอะไรไว้เยอะจนลืมไปว่าวางลงได้ ลองสลัดมันออกสักหน่อย แล้วค่อยเริ่มใหม่' },
+    { title: 'Your Hand In Mine - Explosions In the Sky', embed: SC('explosionsinthesky/your-hand-in-mine-2'), meaning: 'ไม่ต้องมีคำพูดก็ได้ ปล่อยให้เสียงดนตรีพาความอัดอั้นออกไป แล้วค่อยๆ เบาลงไปพร้อมกัน' },
+  ],
+  cathartic: [
+    { title: 'All I Want - Kodaline', embed: SC('kodaline/all-i-want-1'), meaning: 'การคิดถึงใครสักคนจนเจ็บ แปลว่าใจเราเคยรักจริง ร้องไห้ออกมาได้นะ' },
+    { title: 'Skinny Love - Birdy', embed: SC('officialbirdy/birdy-skinny-love'), meaning: 'ความเศร้าบางอย่างไม่ต้องรีบหาย ปล่อยให้มันอยู่สักพัก แล้วมันจะเบาลงเอง' },
+  ],
+  nostalgia: [
+    { title: 'Somewhere Only We Know - Keane', embed: SC('keanemusic/somewhere-only-we-know'), meaning: 'ที่ที่เคยอบอุ่นยังอยู่ในใจเราเสมอ กลับไปคิดถึงได้ทุกเมื่อที่เหนื่อย' },
+    { title: 'Yellow - Coldplay', embed: SC('coldplay/yellow'), meaning: 'มีใครบางคนมองเห็นแสงในตัวคุณเสมอ แม้ในวันที่คุณมองไม่เห็นมันเอง' },
+  ],
+  intro: [
+    { title: 'Holocene - Bon Iver', embed: SC('jagjaguwar/bon-iver-holocene'), meaning: 'บางครั้งการรู้สึกตัวเล็กๆ ก็ทำให้เรื่องในหัวเบาลง เราไม่จำเป็นต้องคิดให้จบทุกเรื่องในคืนนี้' },
+    { title: 'Anchor - Novo Amor', embed: SC('iamnovoamor/anchor'), meaning: 'ในวันที่ความคิดพัดไปมา หาอะไรสักอย่างไว้ยึด แค่ลมหายใจตัวเองก็ได้' },
+  ],
+  still: [
+    { title: 'Nuvole Bianche - Ludovico Einaudi', embed: SC('ludovicoeinaudi/nuvole-bianche-remastered-2020'), meaning: 'ไม่ต้องคิด ไม่ต้องพูด ปล่อยให้เปียโนเล่นไป เหมือนมองเมฆค่อยๆ ลอยผ่าน' },
+    { title: 'saman - Ólafur Arnalds', embed: SC('olafur-arnalds/saman-sunrise-session-ii'), meaning: 'ความเงียบก็เป็นที่พักได้ อยู่ตรงนี้เฉยๆ สักพักก็พอ' },
+  ],
+  calm: [
+    { title: 'Banana Pancakes - Jack Johnson', embed: SC('jackjohnsonmusic/banana-pancakes'), meaning: 'วันฝนตกก็ไม่ต้องรีบไปไหน อยู่ช้าๆ ทำอะไรง่ายๆ ให้ตัวเองบ้าง' },
+    { title: 'Show Me How - Men I Trust', embed: SC('men-i-trust/men-i-trust-show-me-how'), meaning: 'ค่อยๆ หายใจตามจังหวะเพลง ไหล่ตกลงนิดนึง ใจจะช้าลงตามมาเอง' },
+  ],
+  easy: [
+    { title: 'Lover Boy - Phum Viphurit', embed: SC('phumviphurit/lover-boy-a-colors-show'), meaning: 'ความสุขเล็กๆ ไม่ต้องมีเหตุผลก็ได้ วันนี้ใจเบาก็ปล่อยให้มันเบาไป' },
+    { title: 'Riptide - Vance Joy', embed: SC('vancejoy/02-riptide'), meaning: 'ชีวิตไม่ต้องเพอร์เฟกต์ก็สนุกได้ ฮัมเพลงไปเรื่อยๆ ไม่ต้องคิดมาก' },
+  ],
+  uplift: [
+    { title: 'Fix You - Coldplay', embed: SC('coldplay/fix-you-1'), meaning: 'ในวันที่พยายามแล้วยังไม่ดีขึ้น จะมีแสงพาคุณกลับบ้านเสมอ ไม่ต้องรีบหายดีในวันเดียว' },
+    { title: 'Keep Your Head Up - Ben Howard', embed: SC('benhowardofficial/keep-your-head-up'), meaning: 'เงยหน้าขึ้นนิดนึง ก้าวเล็กๆ วันนี้ก็คือการไปข้างหน้าแล้ว' },
+  ],
 };
+export const pickTrack = (mood) => { const L = TRACKS[mood] || TRACKS.calm; return L[Math.random() * L.length | 0]; };
 
 // ใบเสร็จ — ประโยคถึงคุณ ตามเรื่องแรกที่เลือกในข้อ 1
 export const HEART = {

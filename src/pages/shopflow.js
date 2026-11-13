@@ -11,7 +11,7 @@ const COVER = Object.fromEntries(Object.entries(import.meta.glob('../art/covers/
 import { audio } from '../lib/audio.js';
 import { REDUCE, clamp } from '../lib/util.js';
 import { createRain } from '../lib/rain.js';
-import { TOPICS, RAIN, SONGS, MOODS, TRACK, HEART, ACTION, batteryReply, pickMood, LINKS, isRisk } from './shopdata.js';
+import { TOPICS, RAIN, SONGS, MOODS, pickTrack, HEART, ACTION, batteryReply, pickMood, LINKS, isRisk } from './shopdata.js';
 import { saveReceipt } from './receipt-image.js';
 import walkSvg from '../art/shop/src-svg/m-walk.svg?raw';
 // ท่าเดิน: ใช้ SVG ตัวจริงเพื่อขยับขาได้ (2 path แรกในไฟล์คือขา)
@@ -262,7 +262,7 @@ export function createShopFlow({ onExit } = {}) {
   }
 
   async function findSong() {
-    st.mood = pickMood(st); setSheet({ hint: 'กำลังค้นหาเพลง' }); cam.boost = 1.05; await walkTo(459, 505, 'find');
+    st.mood = pickMood(st); st.track = pickTrack(st.mood); setSheet({ hint: 'กำลังค้นหาเพลง' }); cam.boost = 1.05; await walkTo(459, 505, 'find');
     say('ผมจะหาเพลง\nที่เหมาะกับอารมณ์คุณช่วงนี้ให้นะ'); for (let i = 0; i < 4; i++) { await wait(900); audio.fx('rummage'); hop(); }
     pose('found1'); hop(); audio.fx('found'); await say('ผมเจอแล้ว ไปฟังเพลงกันนะ', { hold: 1500 });
     cam.boost = 1.12; await walkTo(742, 470, 'found2');
@@ -275,7 +275,7 @@ export function createShopFlow({ onExit } = {}) {
   function setPlaying(on) { playing = on; el.classList.toggle('playing', on); if (on) spawnNotes(); }
   function spawnNotes() { const box = $('#notes'); if (box.dataset.on) return; box.dataset.on = 1; const iv = setInterval(() => { if (!alive) { clearInterval(iv); delete box.dataset.on; return; } if (!playing) return; const n = document.createElement('span'); n.textContent = ['♪', '♫', '♩'][Math.random() * 3 | 0]; n.style.cssText = `left:${840 + Math.random() * 90}px;top:${225 + Math.random() * 20}px;--dx:${(Math.random() * 120 - 40) | 0}px;color:${['#00C4B3', '#F0655B', '#F6B73C', '#5B4DB5'][Math.random() * 4 | 0]}`; box.appendChild(n); setTimeout(() => n.remove(), 3600); }, 700); }
   function mountEmbed() {
-    if (embed.firstChild) return; embed.innerHTML = `<iframe title="เครื่องเล่นเพลง SoundCloud" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="${TRACK.embed}"></iframe>`;
+    if (embed.firstChild?.getAttribute('src') === st.track.embed) return; widget = null; embed.innerHTML = `<iframe title="เครื่องเล่นเพลง SoundCloud" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="${st.track.embed}"></iframe>`;
     const f = embed.firstChild, sc = document.createElement('script'); sc.src = 'https://w.soundcloud.com/player/api.js';
     sc.onload = () => { try { widget = window.SC.Widget(f); const E = window.SC.Widget.Events; widget.bind(E.PLAY, () => { setPlaying(true); audio.music(false); }); widget.bind(E.PAUSE, () => setPlaying(false)); widget.bind(E.FINISH, () => setPlaying(false)); } catch (e) {} };
     document.head.appendChild(sc);
@@ -287,7 +287,7 @@ export function createShopFlow({ onExit } = {}) {
     setBtn(''); el.classList.add('needle'); await wait(1700); audio.fx('needle'); await wait(600);
     try { widget?.play(); } catch (e) {} setPlaying(true); audio.music(false); pose('listen'); hop(); cam.boost = 1;
     embed.hidden = false; top.classList.add('small');
-    dyn.insertAdjacentHTML('afterbegin', `<div class="sf-mean"><div class="sf-cv"><img src="${COVER[st.mood]}" alt="ปกแผ่น ${mood.th}"><span><small>แผ่นของคุณวันนี้</small><b class="mood">${mood.th}</b><i>${mood.en}</i></span></div><small>ความหมายจากเพลง</small><b>${esc(TRACK.title)}</b><p>${esc(TRACK.meaning)}</p></div>`);
+    dyn.insertAdjacentHTML('afterbegin', `<div class="sf-mean"><div class="sf-cv"><img src="${COVER[st.mood]}" alt="ปกแผ่น ${mood.th}"><span><small>แผ่นของคุณวันนี้</small><b class="mood">${mood.th}</b><i>${mood.en}</i></span></div><small>ความหมายจากเพลง</small><b>${esc(st.track.title)}</b><p>${esc(st.track.meaning)}</p></div>`);
     dyn.querySelector('#sfgo').insertAdjacentHTML('afterend', '<button class="sf-skip" id="sfskip">รับใบเสร็จ</button>'); say('ฟังไปด้วยกันนะครับ');
     setBtn('พักฟังเพลงสักแป๊บนะ', false); const my = run; setTimeout(() => { if (my === run && dyn.classList.contains('sf-player')) { setBtn('รับใบเสร็จ'); dyn.querySelector('#sfskip')?.remove(); } }, 10000);
     await press();
@@ -297,10 +297,10 @@ export function createShopFlow({ onExit } = {}) {
     const mood = MOODS[st.mood], d = new Date(), MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
     const when = `${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear() + 543} · ${String(d.getHours()).padStart(2, '0')}.${String(d.getMinutes()).padStart(2, '0')} น.`;
     const topic = st.topics.length && !st.heavy ? TOPICS[st.topics[0]].label : null, heart = st.heavy ? 'แค่มาถึงตรงนี้ ก็พอแล้วนะ ไม่ต้องทำอะไรต่อก็ได้' : HEART[topic] || HEART._;
-    const data = { when, mood, cover: COVER[st.mood], track: TRACK.title, topic, heart, action: st.heavy ? null : ACTION(st.battery), heavy: st.heavy, logoUrl };
+    const data = { when, mood, cover: COVER[st.mood], track: st.track.title, topic, heart, action: st.heavy ? null : ACTION(st.battery), heavy: st.heavy, logoUrl };
     say.hide(); pose('listen'); top.innerHTML = ''; top.classList.remove('small'); embed.classList.add('slim');
     swapOut(); dyn.className = 'sf-dyn sf-rc'; dyn.innerHTML = `<div class="sf-rcw" id="rcw"><i class="slot"></i><div class="sf-paperr" id="rp"><img class="lg" src="${logoUrl}" alt="ooca"><b class="nm">ร้านแผ่นเสียง ooca - ฟังใจ</b><small>ที่หลบฝนสำหรับใจที่เหนื่อย</small>
-      <div class="r sm"><span>${when}</span><span>#0001</span></div><hr><div class="r cv"><img src="${COVER[st.mood]}" alt=""><span>แผ่นเสียง · ${mood.th}<br>(${mood.en})<br><small>เพลง: ${esc(TRACK.title)}</small></span><span>0.00</span></div><div class="r"><span>ที่นั่งหลบฝน (ไม่จำกัดเวลา)</span><span>0.00</span></div><div class="r"><span>คนฟังคุณเล่า</span><span>0.00</span></div><hr>
+      <div class="r sm"><span>${when}</span><span>#0001</span></div><hr><div class="r cv"><img src="${COVER[st.mood]}" alt=""><span>แผ่นเสียง · ${mood.th}<br>(${mood.en})<br><small>เพลง: ${esc(st.track.title)}</small></span><span>0.00</span></div><div class="r"><span>ที่นั่งหลบฝน (ไม่จำกัดเวลา)</span><span>0.00</span></div><div class="r"><span>คนฟังคุณเล่า</span><span>0.00</span></div><hr>
       <div class="r tot"><span>รวมทั้งหมด</span><span>0.00</span></div><div class="r"><span>ชำระด้วย: การเข้ามาหลบฝน</span></div><hr>
       <div class="hrt"><small>ถึงคุณ${topic ? ' เรื่อง' + topic : ''}</small><p>${heart}</p><em>— ooca</em></div>${data.action ? `<hr><div class="act"><small>ลองทำสัก 1 นาที</small><p>${data.action}</p></div>` : ''}
       <hr><div class="hl">${st.heavy ? '<b>สายด่วนสุขภาพจิต 1323 (24 ชั่วโมง)</b><br>ถ้าอยู่ในอันตรายตอนนี้โทร 1669' : 'ถ้าอยากคุยกับใครสักคน โทร 1323 ได้ตลอด 24 ชั่วโมง'}</div><i class="bar"></i><p class="th">ขอบคุณที่แวะมานะครับ<br>ฝนหยุดเมื่อไหร่ ก็กลับมาได้เสมอ</p></div></div>
