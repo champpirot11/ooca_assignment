@@ -27,7 +27,7 @@ export function createHome({ onEnter }) {
   function layout() {
     const W = el.clientWidth, H = el.clientHeight; s = Math.min(W / 390, H / 844); dpr = Math.min(devicePixelRatio || 1, 2);
     off.x = (W - 390 * s) / 2; off.y = (H - 844 * s) / 2; off.x0 = -off.x / s; off.w = W / s; off.y0 = -off.y / s; off.h = H / s;   // ฝนเต็มจอ (พิกัดดีไซน์ขยายออกข้างๆ)
-    Object.assign(stage.style, { width: 390 * s + 'px', height: 844 * s + 'px', left: off.x + 'px', top: off.y + 'px', '--s': s });
+    Object.assign(stage.style, { width: 390 * s + 'px', height: 844 * s + 'px', left: off.x + 'px', top: off.y + 'px' }); stage.style.setProperty('--s', s);   // ต้องใช้ setProperty ตัวแปร CSS ถึงจะติด
     for (const c of [cvB, cvF]) { c.width = W * dpr; c.height = H * dpr; }
   }
   const DX = .16;   // ฝนเฉียงนิดๆ
