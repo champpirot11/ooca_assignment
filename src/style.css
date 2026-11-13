@@ -198,7 +198,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hm-art svg { display: block; width: 100%; height: auto; }
 .hm-logo { position: absolute; left: calc(79px * var(--s)); top: calc(496px * var(--s)); width: calc(232px * var(--s)); animation: hmin 1.2s ease .5s both; } .hm-logo svg { display: block; width: 100%; height: auto; }
 .hm-title { position: absolute; left: 0; right: 0; top: calc(584px * var(--s)); text-align: center; font-weight: 500; font-size: calc(18px * var(--s)); line-height: 1.4; animation: hmin 1.2s ease .7s both; }
-.hm-copy { position: absolute; left: 0; right: 0; top: calc(614px * var(--s)); text-align: center; font-weight: 500; font-size: calc(15px * var(--s)); line-height: 1.6; color: #fff; text-shadow: 0 1px 2px rgba(0, 70, 70, .25); animation: hmin 1.2s ease .8s both; }
+.hm-copy { position: absolute; left: 0; right: 0; top: calc(614px * var(--s)); text-align: center; font-weight: 400; font-size: calc(15px * var(--s)); line-height: 1.6; color: #fff; text-shadow: 0 1px 2px rgba(0, 70, 70, .25); animation: hmin 1.2s ease .8s both; }
 .hm-btn { position: absolute; left: calc(24px * var(--s)); width: calc(342px * var(--s)); top: calc(703px * var(--s)); height: calc(53px * var(--s)); border-radius: calc(24px * var(--s)); background: #fff; color: #1FA89A; font-weight: 600; font-size: calc(16px * var(--s)); box-shadow: 0 4px 14px rgba(0, 60, 60, .2); transition: transform .2s, filter .2s; animation: hmin 1.2s ease 1s both, hmpulse 2.8s ease-in-out 2.5s infinite; }
 @keyframes hmpulse { 50% { box-shadow: 0 4px 24px rgba(255, 255, 255, .45); } }
 .hm-btn:active { transform: scale(.98); filter: brightness(.96); }
