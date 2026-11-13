@@ -327,9 +327,9 @@ export function createShopFlow({ onExit } = {}) {
     // เพลงที่ฟังอยู่เล่นต่อเบาๆ จนกดกลับหน้าแรก (ถ้าไม่ได้เล่นอยู่ → ใช้เพลงในร้านตามเดิม)
     embed.hidden = true; embed.classList.remove('slim'); top.innerHTML = '';
     if (playing) fadeWidget(35, 2000); else { el.classList.remove('needle'); audio.music(true); }
-    setSheet({ skip: playing ? 'หยุดเพลง' : '' }); cam.boost = 1; pose('wave'); hop(); audio.fx('bye'); el.classList.add('warm');
+    setSheet({}); cam.boost = 1; pose('wave'); hop(); audio.fx('bye'); el.classList.add('warm');
     await say('ฝนหยุดเมื่อไหร่\nก็กลับมาได้เสมอนะครับ', { hold: 1200 }); setBtn('กลับไปที่หน้าแรก');
-    for (;;) { const r = await press(); if (r !== 'skip') break; try { widget?.pause(); } catch (e) {} setPlaying(false); dyn.querySelector('#sfskip')?.remove(); audio.music(true); }
+    await press();
     if (playing) { await fadeWidget(0, 1400); } try { widget?.pause(); } catch (e) {} setPlaying(false); el.classList.remove('needle'); try { widget?.setVolume(100); } catch (e) {}
     Object.assign(st, { topics: [], rain: null, battery: null, songs: [], note: '', heavy: false, mood: null }); onExit?.();
   }
@@ -356,7 +356,15 @@ export function createShopFlow({ onExit } = {}) {
 
   async function start(from = 0) {
     const my = ++run; alive = true; el.classList.add('on'); el.classList.remove('warm', 'needle', 'playing'); $('#desk').innerHTML = ''; embed.hidden = true; top.innerHTML = ''; audio.scene('shop'); audio.room(.45, 1500); nudge();
-    const gate = async () => { if (!st.heavy && st.battery !== null && (st.battery <= 10 || (st.battery <= 20 && RAIN[st.rain]?.storm))) await danger(); };
+    const gate = async () => {
+      if (!st.heavy && st.battery !== null && (st.battery <= 10 || (st.battery <= 20 && RAIN[st.rain]?.storm))) return danger();
+      // คั่นก่อนข้อ 4: ooca พูดรับแบตใจสั้นๆ แล้วชวนไปเลือกเพลง
+      const b = st.battery, line = b === null ? 'ไม่เป็นไรนะครับ ไม่ต้องตอบทุกข้อก็ได้\nงั้นมาเลือกเพลงด้วยกันดีกว่า'
+        : b <= 30 ? 'ขอบคุณที่บอกผมนะครับ\nเดี๋ยวเราหาเพลงที่ช่วยชาร์จใจกัน'
+        : b <= 60 ? 'เหนื่อยบ้างก็ไม่เป็นไรนะครับ\nงั้นมาเลือกเพลงที่ใช่สำหรับวันนี้กัน'
+        : 'ดีใจที่ยังมีแรงอยู่นะครับ\nงั้นมาเลือกเพลงด้วยกันเลย';
+      pose('wave'); await say(line, { hold: 1900 });
+    };
     const seq = [intro, q1, q2, q3, gate, q4, q5, findSong, player, receipt, bye], Q = new Set([q1, q2, q3, q4, q5]);
     const LOADING = new Map([[q1, 'ooca กำลังเก็บกระดาษให้'], [q2, 'กำลังฟังเรื่องฝนของคุณ'], [q3, 'กำลังชาร์จแบตใจ'], [q4, 'กำลังเลือกจังหวะเพลง'], [q5, 'กำลังอ่านโน้ตของคุณ']]);
     // ทดสอบเพลง: ?song=calm-1 → ข้ามไปหน้าเครื่องเล่นพร้อมเพลงนั้นเลย

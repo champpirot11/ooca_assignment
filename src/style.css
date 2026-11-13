@@ -214,3 +214,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @keyframes hmup { from { transform: translateY(100%); } }
 @media (prefers-reduced-motion: reduce) { .hm-text, .hm-sheet, .hm-btn { animation: none; } }
 @media (max-height: 640px) { .hm-text { top: calc(40 * var(--u)); } .hm-logo { width: calc(170 * var(--u)); } }
+
+.home.instant { transition: none; }
+.fadeblk { position: absolute; inset: 0; z-index: 60; background: #0d1418; opacity: 0; pointer-events: none; transition: opacity 1.4s ease; }
+.fadeblk.on { opacity: 1; pointer-events: auto; transition-duration: 1.2s; }

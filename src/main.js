@@ -71,10 +71,17 @@ $('back').addEventListener('click', () => { audio.unlock(); back(); });
 $('skip').addEventListener('click', () => { if (cur < LAST) go(LAST); });
 const talk = createShopFlow({ onExit: leaveShop }); screenEl.appendChild(talk.el);
 // หน้าแรก: กดปุ่ม = ปลดล็อกเสียง แล้วเริ่มบทเกริ่นฉาก 1 พร้อมเสียงฝน
-const home = createHome({ onEnter: () => { audio.unlock(); home.hide(); resetPrologue(); go(0); } }); screenEl.appendChild(home.el); home.mount();
+// กดเริ่ม: จอค่อยๆ มืด → เข้าบทเกริ่นฉาก 1 → ค่อยๆ สว่าง
+const blk = document.createElement('div'); blk.className = 'fadeblk'; screenEl.appendChild(blk);
+let entering = false;
+const home = createHome({ onEnter: () => { if (entering) return; entering = true; audio.unlock(); audio.scene('none'); blk.classList.add('on');
+  setTimeout(() => { home.hide(true); resetPrologue(); go(0); setTimeout(() => { blk.classList.remove('on'); entering = false; }, 350); }, 1300); } });
+screenEl.appendChild(home.el); home.mount();
+// หน้าแรก: แตะตรงไหนก็ได้ครั้งแรก = เปิดเสียงฝนข้างนอก + เพลงในร้าน (เบราว์เซอร์ไม่ให้เล่นเสียงก่อนแตะ)
+home.el.addEventListener('pointerdown', () => { if (entering || !home.on) return; audio.unlock(); if (!home.heard) { home.heard = true; audio.scene('home'); } }, { capture: true });
 const startHome = !(param('step', 0) || param('talk', 0) || param('song', 0)); if (!startHome) home.hide();
 function resetPrologue() { Object.values(pages).forEach((p) => { p.el.classList.remove('on'); p.leave?.(); }); copyEls.forEach((c) => c.classList.remove('on')); hint.classList.remove('on'); cta.classList.remove('on'); clearTimeout(hintTimer); cur = -1; }
-function leaveShop() { talk.stop(); screenEl.classList.remove('in-shop'); resetPrologue(); home.show(); audio.scene('home'); }   // จบแล้วกลับหน้าแรก   // จบแล้วกลับหน้าแรก คำตอบถูกล้างแล้ว
+function leaveShop() { talk.stop(); screenEl.classList.remove('in-shop'); resetPrologue(); home.show(); home.heard = true; audio.scene('home'); }   // จบแล้วกลับหน้าแรก   // จบแล้วกลับหน้าแรก คำตอบถูกล้างแล้ว
 function enterShop(from = 0) { audio.unlock(); screenEl.classList.add('in-shop'); window.dispatchEvent(new CustomEvent('prologue:done')); talk.start(from); }
 cta.addEventListener('click', () => enterShop());
 addEventListener('keydown', (e) => { if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { if (e.target.closest?.('button')) return; e.preventDefault(); next(); } if (e.key === 'ArrowLeft') back(); });

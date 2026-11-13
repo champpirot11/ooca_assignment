@@ -205,12 +205,13 @@ export const audio = {
   music(on) { musicOn(on); },
   // ฉาก: เปลี่ยนความดังของฝนและพื้นเสียงตามหน้า
   scene(name, stage) {
-    const S = { home: [.35, 0], shopfront: [.8, 0], rain: [1, .0], hand: [.65, .55], walk: [.85, 0], shop: [.45, 0] };
+    const S = { home: [.45, 0], shopfront: [.8, 0], rain: [1, .0], hand: [.65, .55], walk: [.85, 0], shop: [.45, 0] };
     const [r, d] = S[name] || [0, 0];
-    rainTarget = r; dropRate = 0; scn = name + (stage || ''); if (ctx && bus.rainLP && name !== 'shop') bus.rainLP.frequency.setTargetAtTime(20000, ctx.currentTime, .3);
-    if (name === 'shop' && ctx) bus.hum.gain.setTargetAtTime(.012, ctx.currentTime, 1.2);
-    musicOn(name === 'shop'); IN.on = ['rain', 'hand', 'walk', 'shopfront'].includes(name); introSet();
-    if (name !== 'shop' && name !== 'walk' && ctx) bus.hum.gain.setTargetAtTime(0, ctx.currentTime, .4);
+    const inside = name === 'shop' || name === 'home';   // หน้าแรกก็อยู่ในร้าน: ฝนข้างนอกอู้อี้ + เพลงร้าน
+    rainTarget = r; dropRate = 0; scn = name + (stage || ''); if (ctx && bus.rainLP) bus.rainLP.frequency.setTargetAtTime(inside ? 1500 : 20000, ctx.currentTime, .3);
+    if (inside && ctx) bus.hum.gain.setTargetAtTime(.012, ctx.currentTime, 1.2);
+    musicOn(inside); IN.on = ['rain', 'hand', 'walk', 'shopfront'].includes(name); introSet();
+    if (!inside && name !== 'walk' && ctx) bus.hum.gain.setTargetAtTime(0, ctx.currentTime, .4);
   },
   // ในร้าน: ฝนข้างนอกเบาลงและอู้อี้ (level 0..1, cutoff Hz) + ฮัมไฟเบาๆ
   room(level, cutoff = 1500) { rainTarget = level; if (ctx && bus.rainLP) bus.rainLP.frequency.setTargetAtTime(cutoff, ctx.currentTime, .6); },

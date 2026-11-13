@@ -51,8 +51,8 @@ export function createHome({ onEnter }) {
   pose('stand', 1);
   return {
     el,
-    show() { el.classList.add('on'); layout(); },
-    hide() { el.classList.remove('on'); },
+    show() { el.classList.remove('instant'); el.classList.add('on'); layout(); },
+    hide(instant) { el.classList.toggle('instant', !!instant); el.classList.remove('on'); },
     get on() { return el.classList.contains('on'); },
     resize() { layout(); },
     mount() { layout(); next(); },
