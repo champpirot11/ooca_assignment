@@ -208,6 +208,7 @@ export function createShopFlow({ onExit } = {}) {
       if (m.pose !== 'umbrella') { pose('umbrella', -1); cam.dx = 70; layout(1500); } hop(); say(r.reply); setBtn('ไปต่อ 2/5', true);
     };
     const res = await press(); if (res === 'skip') st.rain = null;
+    if (res !== 'back' && res !== 'skip' && st.rain !== null && my === run) { setSheet({ hint: 'เลือกระดับความแรงของฝน' }); rainTo(0); $('#dim').style.opacity = 0; await say('ข้างนอกฝนอาจยังตกอยู่\nแต่ตรงนี้คุณไม่เปียกแล้วนะครับ', { hold: 1600 }); }   // พูดปิดข้อ 2 ก่อนไปข้อ 3
     rainTo(0); $('#dim').style.opacity = 0; audio.room(.45, 1500); if (m.pose === 'umbrella') { pose('stand', 1); cam.dx = 0; layout(1500); }
     return res;
   }
