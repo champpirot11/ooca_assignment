@@ -65,7 +65,7 @@ screenEl.addEventListener('click', (e) => {
 });
 const sndBtn = $('sound');
 function paintSound() { sndBtn.setAttribute('aria-pressed', String(!audio.muted)); sndBtn.setAttribute('aria-label', audio.muted ? 'เปิดเสียง' : 'ปิดเสียง'); sndBtn.classList.toggle('off', audio.muted); }
-sndBtn.addEventListener('click', () => { audio.unlock(); audio.setMuted(!audio.muted); paintSound(); });
+sndBtn.addEventListener('click', () => { audio.unlock(); audio.setMuted(!audio.muted); paintSound(); dispatchEvent(new Event('ooca:mute')); });
 paintSound();
 $('back').addEventListener('click', () => { audio.unlock(); back(); });
 $('skip').addEventListener('click', () => { if (cur < LAST) go(LAST); });
@@ -102,7 +102,9 @@ function resetPrologue() { Object.values(pages).forEach((p) => { p.el.classList.
 function leaveShop() { talk.stop(); screenEl.classList.remove('in-shop'); resetPrologue(); home.show(); home.heard = true; audio.scene('home'); }   // จบแล้วกลับหน้าแรก   // จบแล้วกลับหน้าแรก คำตอบถูกล้างแล้ว
 function enterShop(from = 0) { audio.unlock(); screenEl.classList.add('in-shop'); window.dispatchEvent(new CustomEvent('prologue:done')); talk.start(from); }
 cta.addEventListener('click', () => enterShop());
-addEventListener('keydown', (e) => { if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { if (e.target.closest?.('button')) return; e.preventDefault(); next(); } if (e.key === 'ArrowLeft') back(); });
+addEventListener('keydown', (e) => {   // ปุ่มลัดใช้แค่ในบทเกริ่น: ไม่ทำงานในร้าน/หน้าแรก และไม่แย่งปุ่มตอนพิมพ์
+  if (home.on || screenEl.classList.contains('in-shop') || e.target.closest?.('input, textarea, select, [contenteditable]')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { if (e.target.closest?.('button')) return; e.preventDefault(); next(); } if (e.key === 'ArrowLeft') back(); });
 
 /* ===== ลูปหลัก: ทุกหน้าใช้ rAF ตัวเดียว ===== */
 function resize() { Object.values(pages).forEach((p) => p.resize?.()); home.resize(); }

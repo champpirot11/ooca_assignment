@@ -130,8 +130,10 @@ export function createShopFlow({ onExit } = {}) {
   /* ---------- กล่องขาว ---------- */
   const DOTS = '<span class="sf-dots"><i></i><i></i><i></i></span>';
   // เปลี่ยนเนื้อหากล่องขาว: ของเก่าค่อยๆ จาง ของใหม่ค่อยๆ ขึ้น (ไม่วาป)
-  function swapOut() {
-    if (dyn.childElementCount && !REDUCE) { const g = dyn.cloneNode(true); g.removeAttribute('id'); g.querySelectorAll('[id]').forEach((x) => x.removeAttribute('id')); g.className = dyn.className + ' sf-ghost';
+  let swapT = 0;
+  function swapOut() {   // แผ่นที่ขึ้นมาไม่ถึง 0.2 วิ (เช่นสถานะโหลดตอนข้อถัดไปพร้อมทันที) ไม่ต้องทำเงาจาง ไม่งั้นเงาสองชั้นซ้อนกันดูกระพริบ
+    const young = performance.now() - swapT < 200; swapT = performance.now();
+    if (dyn.childElementCount && !REDUCE && !young) { const g = dyn.cloneNode(true); g.removeAttribute('id'); g.querySelectorAll('[id]').forEach((x) => x.removeAttribute('id')); g.className = dyn.className + ' sf-ghost';
       Object.assign(g.style, { left: dyn.offsetLeft + 'px', top: dyn.offsetTop + 'px', width: dyn.offsetWidth + 'px' }); sin.appendChild(g); setTimeout(() => g.remove(), 500); }
     dyn.style.animation = 'none'; void dyn.offsetWidth; dyn.style.animation = '';
   }
@@ -227,7 +229,7 @@ export function createShopFlow({ onExit } = {}) {
     return res;
   }
 
-  const helpCard = `<div class="sf-care"><a class="sf-btn ready" href="tel:1323">สายด่วนสุขภาพจิต 24 ชั่วโมง โทร 1323</a><a class="sf-btn ghost" href="${LINKS.ooca}" target="_blank" rel="noopener">คุยกับนักจิตวิทยา ooca</a><p>ถ้าอยู่ในอันตรายตอนนี้โทร 1669</p></div>`;
+  const helpCard = `<div class="sf-care"><a class="sf-btn ready" href="tel:1323">สายด่วนสุขภาพจิต 24 ชั่วโมง โทร 1323</a><a class="sf-btn ghost" href="${LINKS.ooca}" target="_blank" rel="noopener">คุยกับนักจิตวิทยา ooca</a><p>ถ้าอยู่ในอันตรายตอนนี้ <a class="tel" href="tel:1669">โทร 1669</a></p></div>`;
   async function danger(fromNote = false) {
     st.heavy = true; pose('care'); cam.boost = 1.12;
     for (;;) {
@@ -270,7 +272,7 @@ export function createShopFlow({ onExit } = {}) {
     const res = await press(); st.note = ta.value.trim(); ta.blur(); if (res === 'back') return res;
     if (st.note) { dyn.querySelector('.sf-note').classList.add('sent'); audio.fx('tear'); await wait(900);
       if (isRisk(st.note)) { say.hide(); await danger(true); return; }   // ข้อความเสี่ยง → ดูแลก่อน แล้วค่อยเล่นต่อ
-      pose('found1'); hop(); await say('ผมจะเก็บไว้ให้ดีนะครับ', { hold: 1400 }); }
+      await say('ผมจะเก็บไว้ให้ดีนะครับ', { hold: 1400 }); }
   }
 
   async function findSong() {
@@ -283,16 +285,18 @@ export function createShopFlow({ onExit } = {}) {
   const TT = `<svg class="sf-tt" viewBox="0 0 330 214" aria-hidden="true"><rect y="10" width="330" height="204" rx="30" fill="#00796D"/><rect width="330" height="204" rx="30" fill="#00C4B3"/><path d="M30 0h160v204H30A30 30 0 010 174V30A30 30 0 0130 0z" fill="#00A896"/><rect x="40" y="176" width="28" height="13" rx="2" fill="#2F4A4A"/><rect x="246" y="176" width="30" height="13" rx="2" fill="#16181d"/><rect x="286" y="176" width="6" height="13" rx="2" fill="#2F4A4A"/><rect x="230" y="88" width="12" height="4" rx="1" fill="#2D6BE0"/>
     <g class="rec"><circle cx="124" cy="98" r="71" fill="#1E1E22"/><circle cx="124" cy="98" r="52" fill="none" stroke="#ffffff14" stroke-width="1.5"/><circle cx="124" cy="98" r="40" fill="none" stroke="#ffffff14" stroke-width="1.5"/><circle cx="124" cy="98" r="30" fill="#F0655B"/><path d="M124 70a28 28 0 0124 14" fill="none" stroke="#ffffff55" stroke-width="3" stroke-linecap="round"/><circle cx="124" cy="98" r="6" fill="#F6B73C"/><circle cx="124" cy="98" r="2" fill="#1E1E22"/></g>
     <g class="arm"><path d="M212 40v104" stroke="#6E7378" stroke-width="5" stroke-linecap="round"/><rect x="204" y="28" width="16" height="18" rx="3" fill="#1E1E22"/><rect x="206" y="138" width="12" height="16" rx="2" fill="#1E1E22" transform="rotate(8 212 146)"/></g></svg>`;
+  let wVol = 100; const setVol = (v) => { wVol = v; try { widget?.setVolume(audio.muted ? 0 : v); } catch (e) {} };   // ปุ่มปิดเสียงต้องปิดเพลงด้วย
+  addEventListener('ooca:mute', () => { try { widget?.setVolume(audio.muted ? 0 : wVol); } catch (e) {} });
   let widget = null, playing = false, wReady = false, wWant = false, needleDown = false;
   // เริ่มเพลงทันทีตอนผู้ใช้แตะ (ยังนับเป็นการแตะของผู้ใช้ เบราว์เซอร์จึงยอมให้เล่น) เปิดเบาไว้ก่อนแล้วค่อยดังขึ้นตอนเข็มวางลงแผ่น
-  function startSong() { if (!widget || !wReady) { wWant = true; return; } try { widget.setVolume(needleDown ? 100 : 0); widget.play(); } catch (e) {} }
+  function startSong() { if (!widget || !wReady) { wWant = true; return; } try { setVol(needleDown ? 100 : 0); widget.play(); } catch (e) {} }
   function setPlaying(on) { playing = on; const show = on && needleDown; el.classList.toggle('playing', show); if (show) spawnNotes();   // ท่าทาง/โน้ตลอย เริ่มหลังเข็มวางลงแผ่น (ไม่ให้ทับแอนิเมชันเข็มเลื่อน)
     if (alive) audio.room(on ? .12 : .45, on ? 1000 : 1500); }   // ตอนเพลงเล่น ฝนเบาลงเหลือแค่บรรยากาศ
   function spawnNotes() { const box = $('#notes'); if (box.dataset.on) return; box.dataset.on = 1; const iv = setInterval(() => { if (!alive) { clearInterval(iv); delete box.dataset.on; return; } if (!playing) return; const n = document.createElement('span'); n.textContent = ['♪', '♫', '♩'][Math.random() * 3 | 0]; n.style.cssText = `left:${840 + Math.random() * 90}px;top:${225 + Math.random() * 20}px;--dx:${(Math.random() * 120 - 40) | 0}px;color:${['#00C4B3', '#F0655B', '#F6B73C', '#5B4DB5'][Math.random() * 4 | 0]}`; box.appendChild(n); setTimeout(() => n.remove(), 3600); }, 700); }
   function mountEmbed() {
     if (embed.firstChild?.getAttribute('src') === st.track.embed) return; widget = null; wReady = false; wWant = false; needleDown = false; embed.classList.remove('tap'); embed.innerHTML = `<iframe title="เครื่องเล่นเพลง SoundCloud" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="${st.track.embed}"></iframe>`;
     const f = embed.firstChild, sc = document.createElement('script'); sc.src = 'https://w.soundcloud.com/player/api.js';
-    sc.onload = () => { try { widget = window.SC.Widget(f); const E = window.SC.Widget.Events; widget.bind(E.READY, () => { wReady = true; if (wWant) { wWant = false; startSong(); } }); widget.bind(E.PLAY, () => { setPlaying(true); audio.music(false); embed.classList.remove('tap'); if (needleDown) { try { widget.getVolume((v) => { if (v < 1) widget.setVolume(100); }); } catch (e) {} } }); widget.bind(E.PAUSE, () => setPlaying(false)); widget.bind(E.FINISH, () => setPlaying(false)); } catch (e) {} };
+    sc.onload = () => { try { widget = window.SC.Widget(f); const E = window.SC.Widget.Events; widget.bind(E.READY, () => { wReady = true; if (wWant) { wWant = false; startSong(); } }); widget.bind(E.PLAY, () => { setPlaying(true); audio.music(false); embed.classList.remove('tap'); if (needleDown) { try { widget.getVolume((v) => { if (v < 1) setVol(100); }); } catch (e) {} } }); widget.bind(E.PAUSE, () => setPlaying(false)); widget.bind(E.FINISH, () => setPlaying(false)); } catch (e) {} };
     document.head.appendChild(sc);
   }
   async function player() {
@@ -303,7 +307,7 @@ export function createShopFlow({ onExit } = {}) {
     needleDown = true; if (playing) setPlaying(true); audio.music(false); pose('listen'); hop(); cam.boost = 1; if (widget && wReady) fadeWidget(100, 1600);
     embed.hidden = false; top.classList.add('small');
     const myP = run; setTimeout(() => { if (myP !== run || playing || !dyn.classList.contains('sf-player')) return;   // เบราว์เซอร์ไม่ยอมเล่นเอง (เช่น iPhone บางรุ่น) → บอกให้แตะปุ่มเล่นในเครื่องเล่น
-      embed.classList.add('tap'); say('แตะปุ่ม ▶ ในเครื่องเล่น\nเพื่อเริ่มเพลงได้เลยนะครับ'); try { widget?.setVolume(100); } catch (e) {} }, 2600);
+      embed.classList.add('tap'); say('แตะปุ่ม ▶ ในเครื่องเล่น\nเพื่อเริ่มเพลงได้เลยนะครับ'); try { setVol(100); } catch (e) {} }, 2600);
     dyn.insertAdjacentHTML('afterbegin', `<div class="sf-mean"><div class="sf-cv"><img src="${COVER[st.mood]}" alt="ปกแผ่น ${mood.th}"><span><small>แผ่นของคุณวันนี้</small><b class="mood">${mood.th}</b><i>${mood.en}</i></span></div><small>ความหมายจากเพลง</small><p class="mn">${esc(st.track.meaning)}</p><b class="tt">♪ ${esc(st.track.title)}</b></div>`);
     dyn.querySelector('#sfgo').insertAdjacentHTML('afterend', '<button class="sf-skip" id="sfskip">รับใบเสร็จ</button>'); say('ฟังไปด้วยกันนะครับ');
     setBtn('พักฟังเพลงสักแป๊บนะ', false); const my = run; setTimeout(() => { if (my === run && dyn.classList.contains('sf-player')) { setBtn('รับใบเสร็จ'); dyn.querySelector('#sfskip')?.remove(); } }, 10000);
@@ -325,7 +329,7 @@ export function createShopFlow({ onExit } = {}) {
       <div class="r sm"><span>${when}</span><span>#0001</span></div><hr><div class="r cv"><img src="${COVER[st.mood]}" alt=""><span>แผ่นเสียง · ${mood.th}<br>(${mood.en})<br><small>เพลง: ${esc(st.track.title)}</small></span><span>0.00</span></div><div class="r"><span>ที่นั่งหลบฝน (ไม่จำกัดเวลา)</span><span>0.00</span></div><div class="r"><span>คนฟังคุณเล่า</span><span>0.00</span></div><hr>
       <div class="r tot"><span>รวมทั้งหมด</span><span>0.00</span></div><div class="r"><span>ชำระด้วย: การเข้ามาหลบฝน</span></div><hr>
       <div class="hrt"><p>${heart}</p></div>${data.action ? `<hr><div class="act"><small>ลองทำสัก 1 นาที</small><p>${data.action}</p></div>` : ''}
-      <hr><div class="hl">${st.heavy ? '<b>สายด่วนสุขภาพจิต 1323 (24 ชั่วโมง)</b><br>ถ้าอยู่ในอันตรายตอนนี้โทร 1669' : 'ถ้าอยากคุยกับใครสักคน โทร 1323 ได้ตลอด 24 ชั่วโมง'}</div><i class="bar"></i><p class="th">ขอบคุณที่แวะมานะครับ<br>ฝนหยุดเมื่อไหร่ ก็กลับมาได้เสมอ</p></div></div>
+      <hr><div class="hl">${st.heavy ? '<b>สายด่วนสุขภาพจิต 1323 (24 ชั่วโมง)</b><br>ถ้าอยู่ในอันตรายตอนนี้ <a class="tel" href="tel:1669">โทร 1669</a>' : 'ถ้าอยากคุยกับใครสักคน โทร 1323 ได้ตลอด 24 ชั่วโมง'}</div><i class="bar"></i><p class="th">ขอบคุณที่แวะมานะครับ<br>ฝนหยุดเมื่อไหร่ ก็กลับมาได้เสมอ</p></div></div>
       <div class="sf-after" id="after"><button class="sf-btn ready" data-r="save">บันทึกภาพใบเสร็จ</button><a class="sf-btn ghost" href="${LINKS.ooca}" target="_blank" rel="noopener">คุยกับนักจิตวิทยาที่ ooca</a><button class="sf-skip" data-r="done">เสร็จสิ้น</button></div>`;
     const rp = dyn.querySelector('#rp'), rcw = dyn.querySelector('#rcw');
     // 1) กล่องขาวค่อยๆ ยืดขึ้น  2) กระดาษค่อยๆ เลื่อนออกจากช่องพิมพ์อย่างต่อเนื่อง  3) ปุ่มค่อยๆ ปรากฏ
@@ -336,7 +340,7 @@ export function createShopFlow({ onExit } = {}) {
   }
 
   // ค่อยๆ ปรับเสียงเพลง SoundCloud (0–100)
-  function fadeWidget(to, ms = 1500) { return new Promise((res) => { if (!widget) return res(); widget.getVolume((v0) => { const t0 = performance.now(); const step = () => { const k = Math.min(1, (performance.now() - t0) / ms); try { widget.setVolume(v0 + (to - v0) * k); } catch (e) {} k < 1 ? requestAnimationFrame(step) : res(); }; step(); }); }); }
+  function fadeWidget(to, ms = 1500) { return new Promise((res) => { if (!widget) return res(); ((v0) => { const t0 = performance.now(); const step = () => { const k = Math.min(1, (performance.now() - t0) / ms); try { setVol(v0 + (to - v0) * k); } catch (e) {} k < 1 ? requestAnimationFrame(step) : res(); }; step(); })(wVol); }); }
   async function bye() {
     // เพลงที่ฟังอยู่เล่นต่อเบาๆ จนกดกลับหน้าแรก (ถ้าไม่ได้เล่นอยู่ → ใช้เพลงในร้านตามเดิม)
     embed.hidden = true; embed.classList.remove('slim'); top.innerHTML = '';
@@ -344,7 +348,7 @@ export function createShopFlow({ onExit } = {}) {
     setSheet({}); cam.boost = 1; pose('wave'); hop(); audio.fx('bye'); el.classList.add('warm');
     await say('ฝนหยุดเมื่อไหร่\nก็กลับมาได้เสมอนะครับ', { hold: 1200 }); setBtn('กลับไปที่หน้าแรก');
     await press();
-    if (playing) { await fadeWidget(0, 1400); } try { widget?.pause(); } catch (e) {} setPlaying(false); el.classList.remove('needle'); try { widget?.setVolume(100); } catch (e) {}
+    if (playing) { await fadeWidget(0, 1400); } try { widget?.pause(); } catch (e) {} setPlaying(false); el.classList.remove('needle'); try { setVol(100); } catch (e) {}
     Object.assign(st, { topics: [], rain: null, battery: null, songs: [], note: '', heavy: false, mood: null, why: [] }); onExit?.();
   }
 
