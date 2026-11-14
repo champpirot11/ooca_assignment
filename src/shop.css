@@ -204,3 +204,4 @@
 .sf-top { transition: opacity .6s ease, height .65s cubic-bezier(.4, 0, .2, 1), margin .65s cubic-bezier(.4, 0, .2, 1); } .sf-top.fadeout { opacity: 0; overflow: hidden; margin-bottom: calc(-12 * var(--u)); }   /* -12 = ช่องว่างระหว่างกล่อง */
 .sf-embed iframe { transition: height .65s cubic-bezier(.4, 0, .2, 1); }
 .sf-hint.nudge { animation: hnudge 1.4s ease; } @keyframes hnudge { 0% { color: #E0655A; } 6%, 18% { transform: translateX(-4px); } 12%, 24% { transform: translateX(4px); } 30% { transform: none; color: #E0655A; } 100% { color: inherit; } }   /* สั่น + แดงแป๊บเดียว แล้วค่อยๆ กลับเป็นสีเดิม */
+.sf-paperr .r.why { margin-top: calc(6 * var(--u)); } .sf-paperr .r.why small { color: #8d8d8d; font-size: calc(11.5 * var(--u)); line-height: 1.5; }

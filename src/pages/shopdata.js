@@ -44,63 +44,83 @@ export const MOODS = {
   easy: { th: 'ใจเบาๆ', en: 'Easy Going' }, uplift: { th: 'ค่อยๆ ไต่ขึ้น', en: 'Gentle Uplift' },
 };
 const LIGHT = ['still', 'calm', 'cathartic'];      // แผ่นเบาสำหรับเส้นทางหนัก
-const SOFTER = { release: ['still', 'cathartic'], easy: ['calm', 'nostalgia'], uplift: ['calm', 'nostalgia'] };   // แบตต่ำ/พายุ → ขยับไปแผ่นที่เบาลง (คิดถึงอดีต/อยู่กับความคิด เบาอยู่แล้ว ไม่ต้องขยับ)
-// เลือกแผ่น: ข้อ 4 เป็นหลัก · แบตต่ำ/ฝนหนักขยับไปแผ่นที่เบาลง · เส้นทางหนักได้เฉพาะแผ่นเบา
 const BY_RAIN = [['easy', 'calm'], ['calm', 'intro'], ['cathartic', 'intro'], ['still', 'cathartic']];   // ไม่ตอบข้อ 4 → เดาจากความแรงฝน (ปรอย → พายุ)
 const any = (L) => L[Math.random() * L.length | 0];
-export function pickMood(st) {
-  let mood = st.songs.length ? SONGS[any(st.songs)].mood           // เลือกมา 2 ข้อ → สุ่มจากทั้งสองข้อ (เดิมใช้แค่ข้อแรก)
-    : (st.battery ?? 50) <= 30 ? 'still' : st.rain != null ? any(BY_RAIN[st.rain]) : any(['calm', 'easy', 'intro', 'nostalgia']);
-  const lowB = st.battery !== null && st.battery <= 30, storm = st.rain === 3;
-  if ((lowB || storm) && SOFTER[mood]) mood = any(SOFTER[mood]);
-  if (st.heavy && !LIGHT.includes(mood)) mood = any(LIGHT);
-  return mood;
-}
 
 // เพลง — มู้ดละ 2 เพลง ใช้เวอร์ชันคัฟเวอร์/อินดี้ที่ศิลปินอัปโหลดเอง (ไฟล์ของค่ายใหญ่ถูกบล็อกในไทย หรือเล่นได้แค่ 30 วิ) ระบบสุ่ม 1 เพลงจากมู้ดที่ได้
 // ความหมาย = ถ้อยคำของเราเอง ไม่ได้ยกเนื้อเพลงมา
 const SC = (path) => `https://w.soundcloud.com/player/?url=${encodeURIComponent('https://soundcloud.com/' + path)}&color=%2300c4b3&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false`;
 export const TRACKS = {
   release: [
-    { title: 'Shake It Out - Florence + The Machine (cover: CARRON)', embed: SC('carronmusic/shake-it-out'), meaning: 'บางวันเราแบกอะไรไว้เยอะจนลืมไปว่าวางลงได้ ลองสลัดมันออกสักหน่อย แล้วค่อยเริ่มใหม่' },
-    { title: 'Unsteady - X Ambassadors (cover: John Allred)', embed: SC('johnallred/x-ambassadors-unsteady-cover-by-allred'), meaning: 'ใจที่โยกเยกไม่ได้แปลว่าอ่อนแอ บอกออกมาว่าไม่ไหวได้ แล้วหาอะไรสักอย่างไว้ยึดก่อนก็พอ' },
+    { title: 'Shake It Out - Florence + The Machine (cover: CARRON)', embed: SC('carronmusic/shake-it-out'), t: ["ตัวเอง", "อนาคต"], e: 5, meaning: 'บางวันเราแบกอะไรไว้เยอะจนลืมไปว่าวางลงได้ ลองสลัดมันออกสักหน่อย แล้วค่อยเริ่มใหม่' },
+    { title: 'Unsteady - X Ambassadors (cover: John Allred)', embed: SC('johnallred/x-ambassadors-unsteady-cover-by-allred'), t: ["ครอบครัว"], e: 4, meaning: 'ใจที่โยกเยกไม่ได้แปลว่าอ่อนแอ บอกออกมาว่าไม่ไหวได้ แล้วหาอะไรสักอย่างไว้ยึดก่อนก็พอ' },
   ],
   cathartic: [
-    { title: 'All I Want - Kodaline (cover: Chris Lanzon)', embed: SC('chrislanzonmusic/alliwant'), meaning: 'การคิดถึงใครสักคนจนเจ็บ แปลว่าใจเราเคยรักจริง ร้องไห้ออกมาได้นะ' },
-    { title: 'Skinny Love - Bon Iver (cover: Georgia Kinahan)', embed: SC('georgiakinahan/skinny-love-bon-iver-birdy'), meaning: 'ความเศร้าบางอย่างไม่ต้องรีบหาย ปล่อยให้มันอยู่สักพัก แล้วมันจะเบาลงเอง' },
+    { title: 'All I Want - Kodaline (cover: Chris Lanzon)', embed: SC('chrislanzonmusic/alliwant'), t: ["ความรัก"], e: 3, meaning: 'การคิดถึงใครสักคนจนเจ็บ แปลว่าใจเราเคยรักจริง ร้องไห้ออกมาได้นะ' },
+    { title: 'Skinny Love - Bon Iver (cover: Georgia Kinahan)', embed: SC('georgiakinahan/skinny-love-bon-iver-birdy'), t: ["ความรัก"], e: 3, meaning: 'ความเศร้าบางอย่างไม่ต้องรีบหาย ปล่อยให้มันอยู่สักพัก แล้วมันจะเบาลงเอง' },
+    { title: "Who You Are - Jessie J (cover: Anna Clendening)", embed: SC('user-529691465/who-you-are-jessie-j-anna-clendening-cover'), t: ["ตัวเอง"], e: 2, meaning: 'ไม่ต้องเป็นใครที่คนอื่นอยากให้เป็นก็ได้ วันที่ไม่ไหว ร้องไห้ได้ แล้วค่อยกลับมาเป็นตัวเองอีกครั้ง' },
   ],
   nostalgia: [
-    { title: 'The Night We Met - Lord Huron (cover: Sammi Lee)', embed: SC('lee_sam_t/the-night-we-met'), meaning: 'การอยากย้อนกลับไปช่วงเวลาหนึ่ง แปลว่ามันเคยมีความหมายกับเรามาก คิดถึงได้ ไม่ผิดเลย' },
-    { title: 'Yellow - Coldplay (cover: Archelle)', embed: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A478672074&color=%2300c4b3&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false', meaning: 'มีใครบางคนมองเห็นแสงในตัวคุณเสมอ แม้ในวันที่คุณมองไม่เห็นมันเอง' },
+    { title: 'The Night We Met - Lord Huron (cover: Sammi Lee)', embed: SC('lee_sam_t/the-night-we-met'), t: ["ความรัก"], e: 2, meaning: 'การอยากย้อนกลับไปช่วงเวลาหนึ่ง แปลว่ามันเคยมีความหมายกับเรามาก คิดถึงได้ ไม่ผิดเลย' },
+    { title: 'Yellow - Coldplay (cover: Archelle)', embed: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A478672074&color=%2300c4b3&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false', t: ["ความรัก", "เพื่อน/สังคม"], e: 3, meaning: 'มีใครบางคนมองเห็นแสงในตัวคุณเสมอ แม้ในวันที่คุณมองไม่เห็นมันเอง' },
+    { title: "The Best Day - Taylor Swift (cover: CARPAL PARKA)", embed: SC('carpalparka/the-best-day-taylor-swift'), t: ["ครอบครัว"], e: 2, meaning: 'บางวันธรรมดากับคนในบ้าน กลับเป็นวันที่ดีที่สุดที่เราจำได้ ความอบอุ่นนั้นยังอยู่กับเราเสมอ' },
   ],
   intro: [
-    { title: 'Holocene - Bon Iver', embed: SC('boniver/holocene'), meaning: 'บางครั้งการรู้สึกตัวเล็กๆ ก็ทำให้เรื่องในหัวเบาลง เราไม่จำเป็นต้องคิดให้จบทุกเรื่องในคืนนี้' },
-    { title: 'Anchor - Novo Amor (cover: eriohutomo)', embed: SC('eriohutomo/anchor-novo-amor-cover'), meaning: 'ในวันที่ความคิดพัดไปมา หาอะไรสักอย่างไว้ยึด แค่ลมหายใจตัวเองก็ได้' },
+    { title: 'Holocene - Bon Iver', embed: SC('boniver/holocene'), t: ["ตัวเอง", "อนาคต"], e: 2, meaning: 'บางครั้งการรู้สึกตัวเล็กๆ ก็ทำให้เรื่องในหัวเบาลง เราไม่จำเป็นต้องคิดให้จบทุกเรื่องในคืนนี้' },
+    { title: 'Anchor - Novo Amor (cover: eriohutomo)', embed: SC('eriohutomo/anchor-novo-amor-cover'), t: ["ตัวเอง"], e: 2, meaning: 'ในวันที่ความคิดพัดไปมา หาอะไรสักอย่างไว้ยึด แค่ลมหายใจตัวเองก็ได้' },
   ],
   still: [
-    { title: 'Bloom - The Paper Kites', embed: SC('nettwerkmusicgroup/the-paper-kites-bloom-bonus'), meaning: 'ความรู้สึกดีๆ ค่อยๆ ผลิบานอย่างเงียบๆ ได้ ไม่ต้องรีบ ไม่ต้องดังก็ได้' },
-    { title: 'Such Great Heights - Iron & Wine', embed: SC('ironandwine/such-great-heights'), meaning: 'ไม่ต้องพูดอะไรก็ได้ แค่นึกถึงคนหรือที่ที่ทำให้ใจอุ่น แล้วนั่งฟังไปเงียบๆ' },
+    { title: 'Bloom - The Paper Kites', embed: SC('nettwerkmusicgroup/the-paper-kites-bloom-bonus'), t: ["ความรัก"], e: 1, meaning: 'ความรู้สึกดีๆ ค่อยๆ ผลิบานอย่างเงียบๆ ได้ ไม่ต้องรีบ ไม่ต้องดังก็ได้' },
+    { title: 'Such Great Heights - Iron & Wine', embed: SC('ironandwine/such-great-heights'), t: ["ความรัก", "เพื่อน/สังคม"], e: 1, meaning: 'ไม่ต้องพูดอะไรก็ได้ แค่นึกถึงคนหรือที่ที่ทำให้ใจอุ่น แล้วนั่งฟังไปเงียบๆ' },
   ],
   calm: [
-    { title: 'Banana Pancakes - Jack Johnson (cover: Nick Duke)', embed: SC('nickdukemusic/banana-pancakes-jack-johnson-cover'), meaning: 'วันฝนตกก็ไม่ต้องรีบไปไหน อยู่ช้าๆ ทำอะไรง่ายๆ ให้ตัวเองบ้าง' },
-    { title: "Don't Know Why - Norah Jones (cover: ruthdian)", embed: SC('ruthdian/norah-jones-dont-know-why'), meaning: 'ไม่ต้องรู้ทุกคำตอบตอนนี้ก็ได้ นั่งฟังเพลงช้าๆ แล้วให้ใจได้พักก่อน' },
+    { title: 'Banana Pancakes - Jack Johnson (cover: Nick Duke)', embed: SC('nickdukemusic/banana-pancakes-jack-johnson-cover'), t: ["การงาน", "การเรียน", "เรื่องเงิน"], e: 2, meaning: 'วันฝนตกก็ไม่ต้องรีบไปไหน อยู่ช้าๆ ทำอะไรง่ายๆ ให้ตัวเองบ้าง' },
+    { title: "Don't Know Why - Norah Jones (cover: ruthdian)", embed: SC('ruthdian/norah-jones-dont-know-why'), t: ["ตัวเอง", "อนาคต"], e: 1, meaning: 'ไม่ต้องรู้ทุกคำตอบตอนนี้ก็ได้ นั่งฟังเพลงช้าๆ แล้วให้ใจได้พักก่อน' },
+    { title: "Lean On Me - Bill Withers (cover: David Bradford)", embed: SC('davidbradfordmusic/lean-on-me-cover'), t: ["เพื่อน/สังคม", "ครอบครัว"], e: 2, meaning: 'ทุกคนมีวันที่ต้องพึ่งใครสักคน การขอให้ใครช่วยไม่ใช่ความอ่อนแอเลย' },
+    { title: "Home - Phillip Phillips (cover: Acoustic Covers)", embed: SC('acoustic_covers/home-phillip-phillips-acoustic-cover'), t: ["ครอบครัว", "อนาคต"], e: 2, meaning: 'ไม่ว่าทางข้างหน้าจะยุ่งเหยิงแค่ไหน เราจะหาที่ที่รู้สึกเหมือนบ้านเจอเสมอ' },
   ],
   easy: [
-    { title: 'Lover Boy - Phum Viphurit (cover: mattjaudian)', embed: SC('mattjaudian/lover-boy-phum-viphuritacoustic-cover'), meaning: 'ความสุขเล็กๆ ไม่ต้องมีเหตุผลก็ได้ วันนี้ใจเบาก็ปล่อยให้มันเบาไป' },
-    { title: 'Riptide - Vance Joy (cover: Kira Alejandro)', embed: SC('kira-alejandro/riptide-vance-joy-cover'), meaning: 'ชีวิตไม่ต้องเพอร์เฟกต์ก็สนุกได้ ฮัมเพลงไปเรื่อยๆ ไม่ต้องคิดมาก' },
+    { title: 'Lover Boy - Phum Viphurit (cover: mattjaudian)', embed: SC('mattjaudian/lover-boy-phum-viphuritacoustic-cover'), t: ["ความรัก"], e: 3, meaning: 'ความสุขเล็กๆ ไม่ต้องมีเหตุผลก็ได้ วันนี้ใจเบาก็ปล่อยให้มันเบาไป' },
+    { title: 'Riptide - Vance Joy (cover: Kira Alejandro)', embed: SC('kira-alejandro/riptide-vance-joy-cover'), t: ["ตัวเอง", "อนาคต"], e: 4, meaning: 'ชีวิตไม่ต้องเพอร์เฟกต์ก็สนุกได้ ฮัมเพลงไปเรื่อยๆ ไม่ต้องคิดมาก' },
+    { title: "Count on Me - Bruno Mars (cover: Porcupine_a)", embed: SC('porcupine-a/count-on-me-bruno-mars-cover'), t: ["เพื่อน/สังคม"], e: 3, meaning: 'มีเพื่อนสักคนที่พร้อมอยู่ข้างๆ ก็ทำให้วันหนักๆ เบาลงได้เยอะ' },
+    { title: "Price Tag - Jessie J (cover: Jannine Weigel)", embed: SC('jannina-weigel/price-tag-jessie-j-cover'), t: ["เรื่องเงิน", "การงาน"], e: 4, meaning: 'ความสุขบางอย่างไม่ต้องมีราคา วันนี้ลองพักเรื่องตัวเลข แล้วยิ้มให้ตัวเองสักหน่อย' },
   ],
   uplift: [
-    { title: 'Fix You - Coldplay (cover: NEKA)', embed: SC('officialneka/fix-you-cover-coldplay'), meaning: 'ในวันที่พยายามแล้วยังไม่ดีขึ้น จะมีแสงพาคุณกลับบ้านเสมอ ไม่ต้องรีบหายดีในวันเดียว' },
-    { title: 'Keep Your Head Up - Ben Howard (cover: Coby Grant)', embed: SC('cobygrant/ben-howard-keep-your-head-up'), meaning: 'เงยหน้าขึ้นนิดนึง ก้าวเล็กๆ วันนี้ก็คือการไปข้างหน้าแล้ว' },
+    { title: 'Fix You - Coldplay (cover: NEKA)', embed: SC('officialneka/fix-you-cover-coldplay'), t: ["ตัวเอง", "ความรัก"], e: 3, meaning: 'ในวันที่พยายามแล้วยังไม่ดีขึ้น จะมีแสงพาคุณกลับบ้านเสมอ ไม่ต้องรีบหายดีในวันเดียว' },
+    { title: 'Keep Your Head Up - Ben Howard (cover: Coby Grant)', embed: SC('cobygrant/ben-howard-keep-your-head-up'), t: ["การเรียน", "การงาน", "อนาคต"], e: 3, meaning: 'เงยหน้าขึ้นนิดนึง ก้าวเล็กๆ วันนี้ก็คือการไปข้างหน้าแล้ว' },
+    { title: "The Climb - Miley Cyrus (cover: Samantha Harvey)", embed: SC('samharveyuk/miley-cyrus-the-climb-cover'), t: ["การเรียน", "อนาคต"], e: 3, meaning: 'ทางที่ชันไม่ได้แปลว่าเราเดินผิด สิ่งที่เติบโตขึ้นระหว่างทางก็มีความหมายพอๆ กับปลายทาง' },
+    { title: "Rise Up - Andra Day (cover: Sanjana Ganesh)", embed: SC('sanjanaganesh/rise-up-andra-day'), t: ["การงาน", "ตัวเอง", "เรื่องเงิน"], e: 3, meaning: 'ล้มกี่ครั้งก็ค่อยๆ ลุกได้ ไม่ต้องรีบ แค่ไม่ทิ้งตัวเองก็พอ' },
   ],
 };
-// สุ่มเพลงในมู้ด แต่ไม่ซ้ำกับเพลงที่ได้ครั้งก่อนในเครื่องนี้ (จำไว้ในเครื่องเท่านั้น)
-export const pickTrack = (mood) => {
-  const L = TRACKS[mood] || TRACKS.calm; let last = null; try { last = localStorage.getItem('ooca-last-track'); } catch (e) {}
-  const pool = L.filter((t) => t.embed !== last), t = any(pool.length ? pool : L);
-  try { localStorage.setItem('ooca-last-track', t.embed); } catch (e) {}
-  return t;
-};
+// เลือกเพลง: ให้คะแนนทุกเพลงจากคำตอบทั้งหมด แล้วเอาเพลงที่คะแนนสูงสุด
+//  ข้อ 4 (อารมณ์ที่อยากฟัง) น้ำหนักมากสุด · ข้อ 1 (เรื่องที่แบก) รองลงมา · ข้อ 2–3 (ฝน/แบตใจ) = เพดานความแรงของเพลง
+//  เส้นทางหนัก → เฉพาะแผ่นเบาและเพลงที่นุ่มที่สุด · ไม่ซ้ำกับเพลงครั้งก่อนในเครื่องนี้ (จำไว้ในเครื่องเท่านั้น)
+const NEAR = { release: ['cathartic', 'uplift'], cathartic: ['release', 'intro', 'still'], nostalgia: ['intro', 'calm'], intro: ['nostalgia', 'still', 'cathartic'],
+  still: ['calm', 'intro'], calm: ['still', 'easy', 'nostalgia'], easy: ['calm', 'uplift'], uplift: ['easy', 'release', 'calm'] };
+export function pickSong(st) {
+  const fromQ4 = st.songs.length > 0, lowB = st.battery !== null && st.battery <= 30, storm = st.rain === 3;
+  const want = fromQ4 ? st.songs.map((i) => SONGS[i].mood) : (st.battery ?? 50) <= 30 ? ['still', 'calm'] : st.rain != null ? BY_RAIN[st.rain] : ['calm', 'easy', 'intro', 'nostalgia'];
+  const topics = st.topics.map((i) => TOPICS[i].label), maxE = st.heavy ? 2 : lowB || storm ? 3 : 5;
+  let last = null; try { last = localStorage.getItem('ooca-last-track'); } catch (e) {}
+  let best = null;
+  for (const [mood, L] of Object.entries(TRACKS)) for (const track of L) {
+    if (track.e > maxE || (st.heavy && !LIGHT.includes(mood))) continue;
+    const hits = track.t.filter((x) => topics.includes(x));
+    let sc = want.includes(mood) ? (fromQ4 ? 10 : 6) : want.some((w) => NEAR[w].includes(mood)) ? 4 : 0;
+    if (hits.length) sc += 5 + (hits.length - 1);
+    if (lowB || storm) sc -= (track.e - 1) * .5;          // ใจเหนื่อย → เพลงนุ่มกว่าได้เปรียบ
+    if (track.embed === last) sc -= 100;
+    sc += Math.random() * .9;                               // คะแนนเท่ากัน → สุ่ม
+    if (!best || sc > best.sc) best = { sc, mood, track, hits };
+  }
+  try { localStorage.setItem('ooca-last-track', best.track.embed); } catch (e) {}
+  // เหตุผลที่ได้เพลงนี้ (โชว์ในใบเสร็จ): เรื่องที่ตรง · อารมณ์ที่เลือก · ฝน/แบตใจ
+  const why = [];
+  if (best.hits.length) why.push(best.hits[0].startsWith('เรื่อง') ? best.hits[0] : 'เรื่อง' + best.hits[0]);
+  const q = st.songs.map((i) => SONGS[i]).find((x) => x.mood === best.mood) || (fromQ4 ? SONGS[st.songs[0]] : null); if (q) why.push(q.label);
+  if (st.rain != null) why.push(RAIN[st.rain].label); if (st.battery !== null) why.push(`แบตใจ ${st.battery}%`);
+  return { mood: best.mood, track: best.track, why };
+}
 
 // ใบเสร็จ — ประโยคถึงคุณ ตามเรื่องแรกที่เลือกในข้อ 1
 export const HEART = {

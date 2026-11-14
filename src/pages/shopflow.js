@@ -11,7 +11,7 @@ const COVER = Object.fromEntries(Object.entries(import.meta.glob('../art/covers/
 import { audio } from '../lib/audio.js';
 import { REDUCE, clamp, param } from '../lib/util.js';
 import { createRain } from '../lib/rain.js';
-import { TOPICS, RAIN, SONGS, MOODS, pickTrack, TRACKS, HEART, ACTION, batteryReply, pickMood, LINKS, isRisk, isRude } from './shopdata.js';
+import { TOPICS, RAIN, SONGS, MOODS, pickSong, TRACKS, HEART, ACTION, batteryReply, LINKS, isRisk, isRude } from './shopdata.js';
 import { saveReceipt } from './receipt-image.js';
 import walkSvg from '../art/shop/src-svg/m-walk.svg?raw';
 // ท่าเดิน: ใช้ SVG ตัวจริงเพื่อขยับขาได้ (2 path แรกในไฟล์คือขา)
@@ -55,7 +55,7 @@ export function createShopFlow({ onExit } = {}) {
     <div class="sf-modal" id="modal" hidden></div>`;
   const $ = (s) => el.querySelector(s);
   const world = $('#world'), sitImg = $('#sitimg'), masc = $('#masc'), shadow = el.querySelector('.sf-shadow'), body = $('#body'), bubble = $('#bubble'), btext = $('#btext'), sheet = $('#sheet'), sin = $('#sin'), dyn = $('#dyn'), embed = $('#embed'), top = $('#top'), modal = $('#modal');
-  const st = { topics: [], rain: null, battery: null, songs: [], note: '', heavy: false, mood: null };
+  const st = { topics: [], rain: null, battery: null, songs: [], note: '', heavy: false, mood: null, why: [] };
   let alive = false, run = 0, kb = 0;
   const U = () => el.clientWidth / 390;
 
@@ -274,7 +274,7 @@ export function createShopFlow({ onExit } = {}) {
   }
 
   async function findSong() {
-    st.mood = pickMood(st); st.track = pickTrack(st.mood); body.querySelectorAll('.cv').forEach((c) => { c.src = COVER[st.mood]; }); setSheet({ hint: 'กำลังค้นหาเพลง' }); cam.boost = 1.05; await walkTo(459, 505, 'find');
+    const pk = pickSong(st); st.mood = pk.mood; st.track = pk.track; st.why = pk.why; body.querySelectorAll('.cv').forEach((c) => { c.src = COVER[st.mood]; }); setSheet({ hint: 'กำลังค้นหาเพลง' }); cam.boost = 1.05; await walkTo(459, 505, 'find');
     say('ผมจะหาเพลง\nที่เหมาะกับอารมณ์คุณช่วงนี้ให้นะ'); for (let i = 0; i < 4; i++) { await wait(900); audio.fx('rummage'); hop(); }
     pose('found1'); hop(); audio.fx('found'); await say('ผมเจอแล้ว ไปฟังเพลงกันนะ', { hold: 1500 });
     cam.boost = 1.12; await walkTo(742, 470, 'found2');
@@ -314,7 +314,7 @@ export function createShopFlow({ onExit } = {}) {
     const mood = MOODS[st.mood], d = new Date(), MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
     const when = `${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear() + 543} · ${String(d.getHours()).padStart(2, '0')}.${String(d.getMinutes()).padStart(2, '0')} น.`;
     const topic = st.topics.length && !st.heavy ? TOPICS[st.topics[0]].label : null, heart = st.heavy ? 'แค่มาถึงตรงนี้ ก็พอแล้วนะ ไม่ต้องทำอะไรต่อก็ได้' : HEART[topic] || HEART._;
-    const data = { when, mood, cover: COVER[st.mood], track: st.track.title, topic, heart, action: st.heavy ? null : ACTION(st.battery), heavy: st.heavy, logoUrl };
+    const data = { when, mood, cover: COVER[st.mood], track: st.track.title, topic, heart, action: st.heavy ? null : ACTION(st.battery), heavy: st.heavy, logoUrl, why: (st.why || []).join(' · ') };
     say.hide(); pose('listen');
     if (top.childElementCount && !REDUCE) {   // เครื่องเล่นแผ่นค่อยๆ เฟดหาย พร้อมยุบที่ว่างลงช้าๆ (เครื่องเล่นเพลงเลื่อนขึ้นไปแบบนุ่มๆ ไม่เด้ง)
       top.style.height = top.offsetHeight + 'px'; void top.offsetHeight; top.classList.add('fadeout'); top.style.height = '0px'; embed.classList.add('slim');
@@ -322,7 +322,7 @@ export function createShopFlow({ onExit } = {}) {
     }
     top.innerHTML = ''; top.classList.remove('small', 'fadeout'); top.style.height = ''; embed.classList.add('slim');
     swapOut(); dyn.className = 'sf-dyn sf-rc'; dyn.innerHTML = `<div class="sf-rcw" id="rcw"><i class="slot"></i><div class="sf-paperr" id="rp"><img class="lg" src="${logoUrl}" alt="ooca"><b class="nm">ร้านแผ่นเสียง ooca - ฟังใจ</b><small>ที่หลบฝนสำหรับใจที่เหนื่อย</small>
-      <div class="r sm"><span>${when}</span><span>#0001</span></div><hr><div class="r cv"><img src="${COVER[st.mood]}" alt=""><span>แผ่นเสียง · ${mood.th}<br>(${mood.en})<br><small>เพลง: ${esc(st.track.title)}</small></span><span>0.00</span></div><div class="r"><span>ที่นั่งหลบฝน (ไม่จำกัดเวลา)</span><span>0.00</span></div><div class="r"><span>คนฟังคุณเล่า</span><span>0.00</span></div><hr>
+      <div class="r sm"><span>${when}</span><span>#0001</span></div><hr><div class="r cv"><img src="${COVER[st.mood]}" alt=""><span>แผ่นเสียง · ${mood.th}<br>(${mood.en})<br><small>เพลง: ${esc(st.track.title)}</small></span><span>0.00</span></div>${data.why ? `<div class="r why"><small>เลือกให้จาก: ${esc(data.why)}</small></div>` : ''}<div class="r"><span>ที่นั่งหลบฝน (ไม่จำกัดเวลา)</span><span>0.00</span></div><div class="r"><span>คนฟังคุณเล่า</span><span>0.00</span></div><hr>
       <div class="r tot"><span>รวมทั้งหมด</span><span>0.00</span></div><div class="r"><span>ชำระด้วย: การเข้ามาหลบฝน</span></div><hr>
       <div class="hrt"><small>ถึงคุณ${topic ? ' เรื่อง' + topic : ''}</small><p>${heart}</p><em>— ooca</em></div>${data.action ? `<hr><div class="act"><small>ลองทำสัก 1 นาที</small><p>${data.action}</p></div>` : ''}
       <hr><div class="hl">${st.heavy ? '<b>สายด่วนสุขภาพจิต 1323 (24 ชั่วโมง)</b><br>ถ้าอยู่ในอันตรายตอนนี้โทร 1669' : 'ถ้าอยากคุยกับใครสักคน โทร 1323 ได้ตลอด 24 ชั่วโมง'}</div><i class="bar"></i><p class="th">ขอบคุณที่แวะมานะครับ<br>ฝนหยุดเมื่อไหร่ ก็กลับมาได้เสมอ</p></div></div>
@@ -345,7 +345,7 @@ export function createShopFlow({ onExit } = {}) {
     await say('ฝนหยุดเมื่อไหร่\nก็กลับมาได้เสมอนะครับ', { hold: 1200 }); setBtn('กลับไปที่หน้าแรก');
     await press();
     if (playing) { await fadeWidget(0, 1400); } try { widget?.pause(); } catch (e) {} setPlaying(false); el.classList.remove('needle'); try { widget?.setVolume(100); } catch (e) {}
-    Object.assign(st, { topics: [], rain: null, battery: null, songs: [], note: '', heavy: false, mood: null }); onExit?.();
+    Object.assign(st, { topics: [], rain: null, battery: null, songs: [], note: '', heavy: false, mood: null, why: [] }); onExit?.();
   }
 
   // ป๊อปอัปค่อยๆ เด้งขึ้น/หายไป (ไม่วาป)
