@@ -242,17 +242,18 @@ export function createShopFlow({ onExit } = {}) {
     cam.boost = 1; pose('stand');
   }
 
+  const q4Hint = () => (st.songs.length >= 2 ? 'เลือกได้ 2 ข้อ แตะอันเดิมเพื่อนำออก' : `เลือกได้ 2 ข้อ · เลือกแล้ว ${st.songs.length}/2`);
   async function q4() {
     await walkTo(770, 512, 'stand'); audio.duck(0);   // ข้อ 4: เพลงร้านเฟดหาย ให้ได้ยินเสียงของแต่ละตัวเลือกชัดๆ
-    setSheet({ cls: 'sf-q', back: true, hint: `เลือกได้ 2 ข้อ · เลือกแล้ว ${st.songs.length}/2`, html: `<div class="sf-opts" id="opts" role="group" aria-label="เลือกได้ 2 ข้อ">${SONGS.map((s, i) => `<button class="sf-opt" data-i="${i}" style="--c:${s.c}" role="checkbox" aria-checked="${st.songs.includes(i)}" aria-pressed="${st.songs.includes(i)}"><i class="v"></i><span>${s.label}</span><i class="ck"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></i></button>`).join('')}</div>`, btn: '', skip: 'ข้ามข้อนี้' });
+    setSheet({ cls: 'sf-q', back: true, hint: q4Hint(), html: `<div class="sf-opts" id="opts" role="group" aria-label="เลือกได้ 2 ข้อ">${SONGS.map((s, i) => `<button class="sf-opt" data-i="${i}" style="--c:${s.c}" role="checkbox" aria-checked="${st.songs.includes(i)}" aria-pressed="${st.songs.includes(i)}"><i class="v"></i><span>${s.label}</span><i class="ck"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></i></button>`).join('')}</div>`, btn: '', skip: 'ข้ามข้อนี้' });
     setBtn('ไปต่อ 4/5', st.songs.length > 0); say('ถ้าสมมติว่าชีวิตของคุณตอนนี้เป็นเพลง\nจะเป็นเพลงแนวไหนครับ'); const my = run;
     dyn.querySelector('#opts').onclick = (e) => {
       const b = e.target.closest('.sf-opt'); if (!b || my !== run) return; const i = +b.dataset.i;
       if (st.songs.includes(i)) st.songs = st.songs.filter((x) => x !== i);
       else { if (st.songs.length >= 2) {   // ครบ 2 ข้อแล้ว → ต้องเอาอันเดิมออกก่อน (ไม่สลับให้เงียบๆ)
-        const hn = dyn.querySelector('#hint'); if (hn) { hn.classList.remove('nudge'); void hn.offsetWidth; hn.classList.add('nudge'); } audio.fx('type'); say('เลือกได้ 2 ข้อนะครับ\nแตะอันเดิมเพื่อเอาออกก่อน'); return; }
+        const hn = dyn.querySelector('#hint'); if (hn) { hn.classList.remove('nudge'); void hn.offsetWidth; hn.classList.add('nudge'); } audio.fx('type'); say('เลือกได้ 2 ข้อนะครับ\nแตะอันเดิมเพื่อนำออกก่อน'); return; }
         st.songs.push(i); audio.vibe(i); say(SONGS[i].say); }
-      b.setAttribute('aria-pressed', String(st.songs.includes(i))); b.setAttribute('aria-checked', String(st.songs.includes(i))); const hn = dyn.querySelector('#hint'); if (hn) hn.textContent = `เลือกได้ 2 ข้อ · เลือกแล้ว ${st.songs.length}/2`; pose(st.songs.length ? 'listen' : 'stand'); if (st.songs.includes(i)) hop(); setBtn('ไปต่อ 4/5', st.songs.length > 0);
+      b.setAttribute('aria-pressed', String(st.songs.includes(i))); b.setAttribute('aria-checked', String(st.songs.includes(i))); const hn = dyn.querySelector('#hint'); if (hn) hn.textContent = q4Hint(); pose(st.songs.length ? 'listen' : 'stand'); if (st.songs.includes(i)) hop(); setBtn('ไปต่อ 4/5', st.songs.length > 0);
     };
     const res = await press(); audio.duck(1); if (res === 'skip') st.songs = []; return res;
   }
