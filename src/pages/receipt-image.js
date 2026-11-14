@@ -16,11 +16,10 @@ function paint(c, d, logo, on) {
   // ปกแผ่นเล็กๆ หน้ารายการแผ่นเสียง
   const cw = 58, cx = P + cw + 14; if (on && d.coverImg) c.drawImage(d.coverImg, P, y - 22, cw, cw * 86 / 89);
   T(`แผ่นเสียง · ${d.mood.th} (${d.mood.en})`, cx, F(400, 20), '#2b2b2b'); T('0.00', W - P, F(400, 20), '#2b2b2b', 'right'); y += 28; T('เพลง: ' + d.track, cx, F(400, 17), '#8d8d8d'); y += 34;
-  if (d.why) { c.font = F(400, 16); for (const l of wrap(c, 'เลือกให้จาก: ' + d.why, mw)) { T(l, P, F(400, 16), '#8d8d8d'); y += 26; } y += 8; }   // เหตุผลที่ได้เพลงนี้
   for (const r of ['ที่นั่งหลบฝน (ไม่จำกัดเวลา)', 'คนฟังคุณเล่า']) { T(r, P, F(400, 20), '#2b2b2b'); T('0.00', W - P, F(400, 20), '#2b2b2b', 'right'); y += 34; } y -= 12; dash();
   T('รวมทั้งหมด', P, F(500, 26), '#2b2b2b'); T('0.00', W - P, F(500, 26), '#2b2b2b', 'right'); y += 34; T('ชำระด้วย: การเข้ามาหลบฝน', P, F(400, 19), '#2b2b2b'); dash();
-  T('ถึงคุณ' + (d.topic ? ' เรื่อง' + d.topic : ''), P, F(400, 18), '#8d8d8d'); y += 8; c.font = F(500, 24);
-  for (const l of wrap(c, d.heart, mw)) { y += 38; T(l, P, F(500, 24), '#00897D'); } y += 34; T('— ooca', W - P, F(400, 18), '#8d8d8d', 'right'); dash();
+  y -= 30; c.font = F(500, 24);
+  for (const l of wrap(c, d.heart, mw)) { y += 38; T(l, P, F(500, 24), '#00897D'); } y += 10; dash();
   if (d.action) {   // กล่อง "ลองทำสัก 1 นาที" ให้ตรงกับใบเสร็จบนจอ
     c.font = F(400, 20); const L = wrap(c, d.action, mw - 40), bh = 46 + L.length * 32;
     if (on) { c.fillStyle = '#EFEFF3'; c.beginPath(); if (c.roundRect) c.roundRect(P, y - 26, mw, bh, 16); else c.rect(P, y - 26, mw, bh); c.fill(); }
