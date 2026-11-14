@@ -1,7 +1,7 @@
 // ฝน 3D (Three.js) ที่ใช้ร่วมกันทุกหน้า — เส้นฝนมีมิติใกล้/ไกล วาดลงแคนวาสโปร่งใส
 // ใช้สี per-vertex RGBA + normal blending (ห้ามใช้ AdditiveBlending บนแคนวาสโปร่งใส จะเป็นเส้นดำ)
 import * as THREE from 'three';
-import { rnd, sm, DW, DH } from './util.js';
+import { rnd, sm, DW, DH, GL_DPR } from './util.js';
 
 const FOV = 42, CAMZ = 7.2;
 
@@ -14,7 +14,7 @@ export function createRain(canvas, opt) {
     warm: null,            // (xScreen) => 0..1 ผสมสีส้มอุ่นจากแสงร้าน
     ...opt,
   };
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: (devicePixelRatio || 1) < 2 });   // จอ retina ไม่ต้อง antialias
   renderer.setClearColor(0x000000, 0);
   const scene = new THREE.Scene();
   const cam = new THREE.PerspectiveCamera(FOV, DW / DH, .1, 100);
@@ -23,7 +23,7 @@ export function createRain(canvas, opt) {
   function resize() {
     const r = canvas.getBoundingClientRect();
     if (!r.width) return;
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
+    renderer.setPixelRatio(GL_DPR());
     renderer.setSize(r.width, r.height, false);
   }
   const v3 = new THREE.Vector3();

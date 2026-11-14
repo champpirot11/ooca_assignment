@@ -6,3 +6,6 @@ export const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 export const DW = 390, DH = 844;       // ขนาดดีไซน์ใน Figma
 const q = new URLSearchParams(location.search);
 export const param = (k, d = null) => (q.has(k) ? q.get(k) : d);
+
+// มือถือ: วาด WebGL ที่ความละเอียด 1.25 เท่า (จอมือถือคมอยู่แล้ว ลดจำนวนพิกเซลที่ต้องวาดลงเกือบครึ่งจาก 1.5) · คอมใช้ 1.5
+export const GL_DPR = () => Math.min(devicePixelRatio || 1, matchMedia('(pointer: coarse)').matches ? 1.25 : 1.5);

@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import bg from '../art/bg2.svg?raw';
 import handUrl from '../art/r_hand.glb?url';
-import { REDUCE, DW, DH } from '../lib/util.js';
+import { REDUCE, DW, DH, GL_DPR } from '../lib/util.js';
 import { audio } from '../lib/audio.js';
 
 const SLIDE_DELAY = .15, SLIDE_IN = 2.2;                   // มือค่อยๆ ลอยขึ้นมารับฝน
@@ -48,7 +48,7 @@ export function createHandPage() {
       const a = new THREE.Vector3(), b = new THREE.Vector3(); let wrist = null, knuckle = null;
       holder.traverse((o) => { if (o.name === 'wrist') wrist = o; if (o.name === 'middle-finger-phalanx-proximal') knuckle = o; });
       if (wrist && knuckle) { wrist.getWorldPosition(a); knuckle.getWorldPosition(b); PALM.copy(a.lerp(b, .6)); PALM.x -= handPivot.position.x; PALM.z -= handPivot.position.z; PALM.y -= handPivot.position.y; PALM.z += .12; }
-      place();
+      place(); warm();
     }, undefined, (e) => console.error('โหลดมือไม่ได้', e));
 
     // ฝน: 95 เส้นแรกเล็งไปที่ฝ่ามือ
@@ -76,8 +76,9 @@ export function createHandPage() {
       const m = new THREE.Mesh(spGeo, new THREE.MeshBasicMaterial({ color: 0xcfe0dc, transparent: true, opacity: .7 }));
       m.visible = false; handPivot.add(m); splashes.push({ mesh: m, active: false, age: 0, maxAge: 18, vx: 0, vy: 0, vz: 0 });
     }
-    resize();
+    resize(); warm();
   }
+  function warm() { if (!renderer) return; const fx = [...ripples, ...splashes]; fx.forEach((r) => { r.mesh.visible = true; }); try { renderer.compile(scene, camera); renderer.render(scene, camera); } catch (e) {} fx.forEach((r) => { r.mesh.visible = r.active; }); renderer.clear(); }   // คอมไพล์เชดเดอร์ล่วงหน้าตอนโหลด ไม่ให้ไปกระตุกตอนเข้าฉาก 2
   function place() {        // ตำแหน่งมือตามเวลา (ลอยขึ้นมาจากขอบล่าง แล้วหายใจเบาๆ)
     if (!handPivot) return;
     const t = time, breatheY = Math.sin(t * 1.5) * .05, breatheRoll = Math.cos(t * 1.2) * .02;
@@ -98,7 +99,7 @@ export function createHandPage() {
       const ang = Math.random() * Math.PI * 2, sp = .015 + Math.random() * .03; s.vx = Math.cos(ang) * sp; s.vy = .04 + Math.random() * .06; s.vz = Math.sin(ang) * sp;
     }
   }
-  function resize() { if (!renderer) return; const r = canvas.getBoundingClientRect(); if (!r.width) return; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5)); renderer.setSize(r.width, r.height, false); if (rainMat) rainMat.uniforms.uH.value = renderer.domElement.height; }
+  function resize() { if (!renderer) return; const r = canvas.getBoundingClientRect(); if (!r.width) return; renderer.setPixelRatio(GL_DPR()); renderer.setSize(r.width, r.height, false); if (rainMat) rainMat.uniforms.uH.value = renderer.domElement.height; }
 
   function tick(dt) {
     if (!built || !running) return;
