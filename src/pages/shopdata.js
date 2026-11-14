@@ -44,13 +44,16 @@ export const MOODS = {
   easy: { th: 'ใจเบาๆ', en: 'Easy Going' }, uplift: { th: 'ค่อยๆ ไต่ขึ้น', en: 'Gentle Uplift' },
 };
 const LIGHT = ['still', 'calm', 'cathartic'];      // แผ่นเบาสำหรับเส้นทางหนัก
-const SOFTER = { release: 'still', easy: 'calm', uplift: 'calm', nostalgia: 'calm', intro: 'still' };
+const SOFTER = { release: ['still', 'cathartic'], easy: ['calm', 'nostalgia'], uplift: ['calm', 'nostalgia'] };   // แบตต่ำ/พายุ → ขยับไปแผ่นที่เบาลง (คิดถึงอดีต/อยู่กับความคิด เบาอยู่แล้ว ไม่ต้องขยับ)
 // เลือกแผ่น: ข้อ 4 เป็นหลัก · แบตต่ำ/ฝนหนักขยับไปแผ่นที่เบาลง · เส้นทางหนักได้เฉพาะแผ่นเบา
+const BY_RAIN = [['easy', 'calm'], ['calm', 'intro'], ['cathartic', 'intro'], ['still', 'cathartic']];   // ไม่ตอบข้อ 4 → เดาจากความแรงฝน (ปรอย → พายุ)
+const any = (L) => L[Math.random() * L.length | 0];
 export function pickMood(st) {
-  let mood = st.songs.length ? SONGS[st.songs[0]].mood : (st.battery ?? 50) <= 30 ? 'still' : 'calm';
+  let mood = st.songs.length ? SONGS[any(st.songs)].mood           // เลือกมา 2 ข้อ → สุ่มจากทั้งสองข้อ (เดิมใช้แค่ข้อแรก)
+    : (st.battery ?? 50) <= 30 ? 'still' : st.rain != null ? any(BY_RAIN[st.rain]) : any(['calm', 'easy', 'intro', 'nostalgia']);
   const lowB = st.battery !== null && st.battery <= 30, storm = st.rain === 3;
-  if ((lowB || storm) && SOFTER[mood] && mood !== 'intro') mood = SOFTER[mood];
-  if (st.heavy && !LIGHT.includes(mood)) mood = 'still';
+  if ((lowB || storm) && SOFTER[mood]) mood = any(SOFTER[mood]);
+  if (st.heavy && !LIGHT.includes(mood)) mood = any(LIGHT);
   return mood;
 }
 
@@ -91,7 +94,13 @@ export const TRACKS = {
     { title: 'Keep Your Head Up - Ben Howard (cover: Coby Grant)', embed: SC('cobygrant/ben-howard-keep-your-head-up'), meaning: 'เงยหน้าขึ้นนิดนึง ก้าวเล็กๆ วันนี้ก็คือการไปข้างหน้าแล้ว' },
   ],
 };
-export const pickTrack = (mood) => { const L = TRACKS[mood] || TRACKS.calm; return L[Math.random() * L.length | 0]; };
+// สุ่มเพลงในมู้ด แต่ไม่ซ้ำกับเพลงที่ได้ครั้งก่อนในเครื่องนี้ (จำไว้ในเครื่องเท่านั้น)
+export const pickTrack = (mood) => {
+  const L = TRACKS[mood] || TRACKS.calm; let last = null; try { last = localStorage.getItem('ooca-last-track'); } catch (e) {}
+  const pool = L.filter((t) => t.embed !== last), t = any(pool.length ? pool : L);
+  try { localStorage.setItem('ooca-last-track', t.embed); } catch (e) {}
+  return t;
+};
 
 // ใบเสร็จ — ประโยคถึงคุณ ตามเรื่องแรกที่เลือกในข้อ 1
 export const HEART = {
