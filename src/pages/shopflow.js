@@ -62,6 +62,7 @@ export function createShopFlow({ onExit } = {}) {
   /* ---------- กล้อง + มาสคอต ---------- */
   const m = { x: 120, y: 418, pose: 'sit', flip: 1 }; const cam = { boost: 1, dx: 0, fy: 0, dur: 1500 }; let S = 1, ox = 0, oy = 0, side = false;   // ทุกอย่างช้าๆ นุ่มๆ
   function layout(dur = cam.dur) {
+    el.classList.toggle('compact', el.clientHeight / U() < 800);   // จอเตี้ย → หน้าเล่นเพลงกะทัดรัด
     const u = U(), W = el.clientWidth, H = el.clientHeight, sh = sin.offsetHeight; sheet.style.height = sh + 'px';
     const sceneH = Math.max(120 * u, H - sh - kb + 20 * u);
     // กล่องขาวสูง → ซูมฉากออกให้ตัว + บับเบิ้ลยังพอดีในพื้นที่ที่เหลือ (บับเบิ้ลไม่บังตัว)
@@ -243,13 +244,13 @@ export function createShopFlow({ onExit } = {}) {
 
   async function q4() {
     await walkTo(770, 512, 'stand'); audio.duck(0);   // ข้อ 4: เพลงร้านเฟดหาย ให้ได้ยินเสียงของแต่ละตัวเลือกชัดๆ
-    setSheet({ cls: 'sf-q', back: true, hint: 'เลือกได้ 2 ข้อ', html: `<div class="sf-opts" id="opts">${SONGS.map((s, i) => `<button class="sf-opt" data-i="${i}" style="--c:${s.c}" aria-pressed="${st.songs.includes(i)}"><i class="v"></i><span>${s.label}</span><i class="ck"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></i></button>`).join('')}</div>`, btn: '', skip: 'ข้ามข้อนี้' });
+    setSheet({ cls: 'sf-q', back: true, hint: `เลือกได้ 2 ข้อ · เลือกแล้ว ${st.songs.length}/2`, html: `<div class="sf-opts" id="opts" role="group" aria-label="เลือกได้ 2 ข้อ">${SONGS.map((s, i) => `<button class="sf-opt" data-i="${i}" style="--c:${s.c}" role="checkbox" aria-checked="${st.songs.includes(i)}" aria-pressed="${st.songs.includes(i)}"><i class="v"></i><span>${s.label}</span><i class="ck"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></i></button>`).join('')}</div>`, btn: '', skip: 'ข้ามข้อนี้' });
     setBtn('ไปต่อ 4/5', st.songs.length > 0); say('ถ้าสมมติว่าชีวิตของคุณตอนนี้เป็นเพลง\nจะเป็นเพลงแนวไหนครับ'); const my = run;
     dyn.querySelector('#opts').onclick = (e) => {
       const b = e.target.closest('.sf-opt'); if (!b || my !== run) return; const i = +b.dataset.i;
       if (st.songs.includes(i)) st.songs = st.songs.filter((x) => x !== i);
-      else { if (st.songs.length >= 2) { const old = st.songs.shift(); dyn.querySelector(`.sf-opt[data-i="${old}"]`).setAttribute('aria-pressed', 'false'); } st.songs.push(i); audio.vibe(i); say(SONGS[i].say); }
-      b.setAttribute('aria-pressed', String(st.songs.includes(i))); pose(st.songs.length ? 'listen' : 'stand'); if (st.songs.includes(i)) hop(); setBtn('ไปต่อ 4/5', st.songs.length > 0);
+      else { if (st.songs.length >= 2) { const old = st.songs.shift(); const ob = dyn.querySelector(`.sf-opt[data-i="${old}"]`); ob.setAttribute('aria-pressed', 'false'); ob.setAttribute('aria-checked', 'false'); } st.songs.push(i); audio.vibe(i); say(SONGS[i].say); }
+      b.setAttribute('aria-pressed', String(st.songs.includes(i))); b.setAttribute('aria-checked', String(st.songs.includes(i))); const hn = dyn.querySelector('#hint'); if (hn) hn.textContent = `เลือกได้ 2 ข้อ · เลือกแล้ว ${st.songs.length}/2`; pose(st.songs.length ? 'listen' : 'stand'); if (st.songs.includes(i)) hop(); setBtn('ไปต่อ 4/5', st.songs.length > 0);
     };
     const res = await press(); audio.duck(1); if (res === 'skip') st.songs = []; return res;
   }
@@ -279,22 +280,26 @@ export function createShopFlow({ onExit } = {}) {
   const TT = `<svg class="sf-tt" viewBox="0 0 330 214" aria-hidden="true"><rect y="10" width="330" height="204" rx="30" fill="#00796D"/><rect width="330" height="204" rx="30" fill="#00C4B3"/><path d="M30 0h160v204H30A30 30 0 010 174V30A30 30 0 0130 0z" fill="#00A896"/><rect x="40" y="176" width="28" height="13" rx="2" fill="#2F4A4A"/><rect x="246" y="176" width="30" height="13" rx="2" fill="#16181d"/><rect x="286" y="176" width="6" height="13" rx="2" fill="#2F4A4A"/><rect x="230" y="88" width="12" height="4" rx="1" fill="#2D6BE0"/>
     <g class="rec"><circle cx="124" cy="98" r="71" fill="#1E1E22"/><circle cx="124" cy="98" r="52" fill="none" stroke="#ffffff14" stroke-width="1.5"/><circle cx="124" cy="98" r="40" fill="none" stroke="#ffffff14" stroke-width="1.5"/><circle cx="124" cy="98" r="30" fill="#F0655B"/><path d="M124 70a28 28 0 0124 14" fill="none" stroke="#ffffff55" stroke-width="3" stroke-linecap="round"/><circle cx="124" cy="98" r="6" fill="#F6B73C"/><circle cx="124" cy="98" r="2" fill="#1E1E22"/></g>
     <g class="arm"><path d="M212 40v104" stroke="#6E7378" stroke-width="5" stroke-linecap="round"/><rect x="204" y="28" width="16" height="18" rx="3" fill="#1E1E22"/><rect x="206" y="138" width="12" height="16" rx="2" fill="#1E1E22" transform="rotate(8 212 146)"/></g></svg>`;
-  let widget = null, playing = false;
+  let widget = null, playing = false, wReady = false, wWant = false, needleDown = false;
+  // เริ่มเพลงทันทีตอนผู้ใช้แตะ (ยังนับเป็นการแตะของผู้ใช้ เบราว์เซอร์จึงยอมให้เล่น) เปิดเบาไว้ก่อนแล้วค่อยดังขึ้นตอนเข็มวางลงแผ่น
+  function startSong() { if (!widget || !wReady) { wWant = true; return; } try { widget.setVolume(needleDown ? 100 : 0); widget.play(); } catch (e) {} }
   function setPlaying(on) { playing = on; el.classList.toggle('playing', on); if (on) spawnNotes(); if (alive) audio.room(on ? .12 : .45, on ? 1000 : 1500); }   // ตอนเพลงเล่น ฝนเบาลงเหลือแค่บรรยากาศ
   function spawnNotes() { const box = $('#notes'); if (box.dataset.on) return; box.dataset.on = 1; const iv = setInterval(() => { if (!alive) { clearInterval(iv); delete box.dataset.on; return; } if (!playing) return; const n = document.createElement('span'); n.textContent = ['♪', '♫', '♩'][Math.random() * 3 | 0]; n.style.cssText = `left:${840 + Math.random() * 90}px;top:${225 + Math.random() * 20}px;--dx:${(Math.random() * 120 - 40) | 0}px;color:${['#00C4B3', '#F0655B', '#F6B73C', '#5B4DB5'][Math.random() * 4 | 0]}`; box.appendChild(n); setTimeout(() => n.remove(), 3600); }, 700); }
   function mountEmbed() {
-    if (embed.firstChild?.getAttribute('src') === st.track.embed) return; widget = null; embed.innerHTML = `<iframe title="เครื่องเล่นเพลง SoundCloud" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="${st.track.embed}"></iframe>`;
+    if (embed.firstChild?.getAttribute('src') === st.track.embed) return; widget = null; wReady = false; wWant = false; needleDown = false; embed.classList.remove('tap'); embed.innerHTML = `<iframe title="เครื่องเล่นเพลง SoundCloud" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="${st.track.embed}"></iframe>`;
     const f = embed.firstChild, sc = document.createElement('script'); sc.src = 'https://w.soundcloud.com/player/api.js';
-    sc.onload = () => { try { widget = window.SC.Widget(f); const E = window.SC.Widget.Events; widget.bind(E.PLAY, () => { setPlaying(true); audio.music(false); }); widget.bind(E.PAUSE, () => setPlaying(false)); widget.bind(E.FINISH, () => setPlaying(false)); } catch (e) {} };
+    sc.onload = () => { try { widget = window.SC.Widget(f); const E = window.SC.Widget.Events; widget.bind(E.READY, () => { wReady = true; if (wWant) { wWant = false; startSong(); } }); widget.bind(E.PLAY, () => { setPlaying(true); audio.music(false); embed.classList.remove('tap'); if (needleDown) { try { widget.getVolume((v) => { if (v < 1) widget.setVolume(100); }); } catch (e) {} } }); widget.bind(E.PAUSE, () => setPlaying(false)); widget.bind(E.FINISH, () => setPlaying(false)); } catch (e) {} };
     document.head.appendChild(sc);
   }
   async function player() {
-    mountEmbed(); const mood = MOODS[st.mood];
+    mountEmbed(); needleDown = false; const mood = MOODS[st.mood];
     top.innerHTML = `<div class="sf-ttw">${TT}</div>`; setSheet({ cls: 'sf-player', btn: '' });
     await say('เขาว่ากันว่าเสียงเพลง\nช่วยปลดปล่อยความรู้สึกของเราได้นะ'); setBtn('ฟังเพลง'); await press();
-    setBtn(''); el.classList.add('needle'); await wait(1700); audio.fx('needle'); await wait(600);
-    try { widget?.play(); } catch (e) {} setPlaying(true); audio.music(false); pose('listen'); hop(); cam.boost = 1;
+    startSong(); setBtn(''); el.classList.add('needle'); await wait(1700); audio.fx('needle'); await wait(600);
+    needleDown = true; audio.music(false); pose('listen'); hop(); cam.boost = 1; if (widget && wReady) fadeWidget(100, 1600);
     embed.hidden = false; top.classList.add('small');
+    const myP = run; setTimeout(() => { if (myP !== run || playing || !dyn.classList.contains('sf-player')) return;   // เบราว์เซอร์ไม่ยอมเล่นเอง (เช่น iPhone บางรุ่น) → บอกให้แตะปุ่มเล่นในเครื่องเล่น
+      embed.classList.add('tap'); say('แตะปุ่ม ▶ ในเครื่องเล่น\nเพื่อเริ่มเพลงได้เลยนะครับ'); try { widget?.setVolume(100); } catch (e) {} }, 2600);
     dyn.insertAdjacentHTML('afterbegin', `<div class="sf-mean"><div class="sf-cv"><img src="${COVER[st.mood]}" alt="ปกแผ่น ${mood.th}"><span><small>แผ่นของคุณวันนี้</small><b class="mood">${mood.th}</b><i>${mood.en}</i></span></div><small>ความหมายจากเพลง</small><p class="mn">${esc(st.track.meaning)}</p><b class="tt">♪ ${esc(st.track.title)}</b></div>`);
     dyn.querySelector('#sfgo').insertAdjacentHTML('afterend', '<button class="sf-skip" id="sfskip">รับใบเสร็จ</button>'); say('ฟังไปด้วยกันนะครับ');
     setBtn('พักฟังเพลงสักแป๊บนะ', false); const my = run; setTimeout(() => { if (my === run && dyn.classList.contains('sf-player')) { setBtn('รับใบเสร็จ'); dyn.querySelector('#sfskip')?.remove(); } }, 10000);

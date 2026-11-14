@@ -28,6 +28,10 @@
 .sf-body .leg { transform-box: fill-box; transform-origin: 50% 8%; }
 .sf-body.walking .leg1 { animation: leg 1.4s ease-in-out infinite; } .sf-body.walking .leg2 { animation: leg 1.4s ease-in-out infinite -.7s; }
 @keyframes leg { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
+.sf-body .arm { transform-box: fill-box; } .sf-body .arm-r { transform-origin: 10% 8%; } .sf-body .arm-l { transform-origin: 90% 6%; }   /* แขนแกว่งสลับกับขา */
+.sf-body.walking .arm-r { animation: armr 1.4s ease-in-out infinite; } .sf-body.walking .arm-l { animation: arml 1.4s ease-in-out infinite; }
+@keyframes armr { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(0deg); } }
+@keyframes arml { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(14deg); } }
 .sf-body.speak { animation: mtalk2 1.4s ease-in-out infinite; }
 .sf-body.walking { animation: mwalk 1.4s ease-in-out infinite; }
 .sf-masc.hop { animation: mhop .85s cubic-bezier(.35, 1.25, .5, 1); }
@@ -109,7 +113,7 @@
     radial-gradient(circle, var(--c) 0 30%, transparent 31%),
     conic-gradient(from 0deg, rgba(255,255,255,.3) 0 7%, transparent 7% 50%, rgba(255,255,255,.18) 50% 56%, transparent 56%),
     repeating-radial-gradient(circle, #23244a 0 1.6px, #34366a 1.6px 2.6px); }
-.sf-opt span { flex: 1; } .sf-opt .ck { width: calc(20 * var(--u)); height: calc(20 * var(--u)); border-radius: 50%; border: 1.5px solid #cfcfcf; display: grid; place-items: center; transition: all .25s; } .sf-opt .ck svg { width: 70%; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+.sf-opt span { flex: 1; } .sf-opt .ck { position: static; transform: none; flex: none; width: calc(24 * var(--u)); height: calc(24 * var(--u)); border-radius: calc(7 * var(--u)); border: 2px solid #b4bcc0; background: #fff; display: grid; place-items: center; transition: all .25s; } .sf-opt .ck svg { width: 70%; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
 .sf-opt[aria-pressed="true"] { background: #E2F7F4; color: #1FA79A; } .sf-opt[aria-pressed="true"] .ck { background: #1FA79A; border-color: #1FA79A; } .sf-opt[aria-pressed="true"] .ck svg { opacity: 1; } .sf-opt[aria-pressed="true"] .v { animation: spin 2.4s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -185,3 +189,14 @@
 .sf-body .held .cv:not([src]) { display: none; }
 
 .sf-hint.warn { color: #C0563F; }
+
+/* จอเตี้ย (สูงน้อยกว่า ~800 หน่วยดีไซน์): หน้าเล่นเพลงแบบกะทัดรัด ให้กล่องขาวไม่บังตัว ooca */
+.sf.compact .sf-top.small { display: none; }
+.sf.compact .sf-embed iframe { height: calc(84 * var(--u)); }
+.sf.compact .sf-mean { padding: calc(10 * var(--u)) calc(14 * var(--u)); }
+.sf.compact .sf-cv { padding-bottom: calc(6 * var(--u)); margin-bottom: calc(6 * var(--u)); gap: calc(10 * var(--u)); }
+.sf.compact .sf-cv img { width: calc(44 * var(--u)); }
+.sf.compact .sf-mean p.mn { font-size: calc(15 * var(--u)); line-height: 1.5; margin: calc(2 * var(--u)) 0 calc(4 * var(--u)); }
+.sf.compact .sf-mean > small { display: none; }
+.sf-embed.tap { box-shadow: 0 0 0 calc(3 * var(--u)) #00C4B3; animation: tapring 1.6s ease-in-out infinite; }
+@keyframes tapring { 50% { box-shadow: 0 0 0 calc(6 * var(--u)) rgba(0, 196, 179, .35); } }
