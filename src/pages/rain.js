@@ -14,7 +14,7 @@ export function createRainPage() {
     el,
     mount() { v.load(); },
     enter() { clearTimeout(offT); play(); },
-    leave() { clearTimeout(offT); offT = setTimeout(() => v.pause(), 1800); },   // หยุดหลังเฟดออกเสร็จ
+    leave() { clearTimeout(offT); offT = setTimeout(() => v.pause(), 2600); },   // หยุดหลังเฟดออกเสร็จ
     resize() {},
     tick() { if (!REDUCE && v.paused && el.classList.contains('on')) play(); },   // กลับมาจากแอปอื่น → เล่นต่อ
   };

@@ -32,7 +32,7 @@ const hint = $('hint'), cta = $('cta'), toastEl = $('toast');
 
 const pages = { rain: createRainPage(), hand: createHandPage(), walk: createWalkPage(), shop: createShopPage() };
 Object.values(pages).forEach((p) => { stack.appendChild(p.el); p.mount?.(); });
-const copyEls = STEPS.map((s) => { const d = document.createElement('div'); d.className = 'copy' + (s.small ? ' sm' : ''); d.innerHTML = s.copy; d.style.setProperty('--d', s.delay + 's'); copies.appendChild(d); return d; });
+const copyEls = STEPS.map((s) => { const d = document.createElement('div'); d.className = 'copy' + (s.small ? ' sm' : ''); d.innerHTML = s.copy; d.style.setProperty('--d', (s.delay + .3) + 's'); copies.appendChild(d); return d; });
 
 let cur = -1, hintTimer = 0, unlockAt = 0, leaveTimers = {};
 function toast(m) { toastEl.textContent = m; toastEl.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => toastEl.classList.remove('show'), 1800); }
@@ -41,7 +41,7 @@ function go(n) {
   n = Math.max(0, Math.min(LAST, n)); if (n === cur) return;
   const prev = cur >= 0 ? STEPS[cur] : null, nxt = STEPS[n];
   if (!prev || prev.page !== nxt.page) {
-    if (prev) { const pp = pages[prev.page]; pp.el.classList.remove('on'); clearTimeout(leaveTimers[prev.page]); leaveTimers[prev.page] = setTimeout(() => pp.leave(), 750); }
+    if (prev) { const pp = pages[prev.page]; pp.el.classList.remove('on'); clearTimeout(leaveTimers[prev.page]); leaveTimers[prev.page] = setTimeout(() => pp.leave(), 1350); }
     const np = pages[nxt.page]; clearTimeout(leaveTimers[nxt.page]); np.enter({ stage: nxt.stage }); np.el.classList.add('on');
   } else pages[nxt.page].setStage?.(nxt.stage);
   cur = n; audio.scene(nxt.page === 'shop' ? 'shopfront' : nxt.page, nxt.stage); screenEl.classList.toggle('last', n === LAST); screenEl.classList.toggle('first', n === 0);   // หน้าร้าน (ฉาก 5) ยังเป็นเพลงบทเกริ่น เพลงในร้านเริ่มตอนเข้าร้าน · ฉากแรกไม่มีปุ่มกลับ ฉากสุดท้ายไม่มีข้าม
@@ -49,8 +49,8 @@ function go(n) {
   $('progress').setAttribute('aria-valuenow', n + 1);
   copyEls.forEach((c, i) => c.classList.toggle('on', i === n));
   hint.classList.remove('on'); cta.classList.remove('on'); clearTimeout(hintTimer);
-  hintTimer = setTimeout(() => (nxt.cta ? cta : hint).classList.add('on'), (REDUCE ? .1 : nxt.hint) * 1000);
-  unlockAt = performance.now() + (REDUCE ? 200 : nxt.lock);
+  hintTimer = setTimeout(() => (nxt.cta ? cta : hint).classList.add('on'), (REDUCE ? .1 : nxt.hint + .8) * 1000);
+  unlockAt = performance.now() + (REDUCE ? 200 : nxt.lock + 500);
 }
 const next = () => { if (cur < LAST && performance.now() >= unlockAt) { audio.tap(); go(cur + 1); } };
 const back = () => { if (cur > 0) { audio.back(); go(cur - 1); } };

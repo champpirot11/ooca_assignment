@@ -272,7 +272,7 @@ export function createShopFlow({ onExit } = {}) {
     const res = await press(); st.note = ta.value.trim(); ta.blur(); if (res === 'back') return res;
     if (st.note) { dyn.querySelector('.sf-note').classList.add('sent'); audio.fx('tear'); await wait(900);
       if (isRisk(st.note)) { say.hide(); await danger(true); return; }   // ข้อความเสี่ยง → ดูแลก่อน แล้วค่อยเล่นต่อ
-      await say('ผมจะเก็บไว้ให้ดีนะครับ', { hold: 1400 }); }
+      await say('ผมจะเก็บรักษาไว้\nเป็นอย่างดีครับ', { hold: 1400 }); }
   }
 
   async function findSong() {

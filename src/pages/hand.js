@@ -28,7 +28,7 @@ export function createHandPage() {
     el,
     mount() { intro.load(); loop.load(); },
     enter() { start(); },
-    leave() { clearTimeout(offT); offT = setTimeout(() => { intro.pause(); loop.pause(); }, 1800); },
+    leave() { clearTimeout(offT); offT = setTimeout(() => { intro.pause(); loop.pause(); }, 2600); },
     resize() {},
     tick() {
       if (REDUCE) return;

@@ -21,10 +21,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .stack, .page { position: absolute; inset: 0; }
 /* ฉากบทเกริ่นคงสัดส่วนดีไซน์ 390×844 เสมอ ชิดขอบล่าง (จอเตี้ยกว่า → ตัดท้องฟ้าด้านบนออกแทนการบีบ/ยืดภาพ) */
 .stack { top: auto; height: max(100%, calc(844 * var(--u))); }
-.page { opacity: 0; pointer-events: none; transition: opacity .7s ease; }
+.page { opacity: 0; pointer-events: none; transition: opacity 1.3s ease; }
 .page.on { opacity: 1; }
-.page.p5 { transition-duration: 1.6s; }   /* ฉาก 4 → 5 เฟดช้าลง */
-.page:not(.on) { visibility: hidden; transition: opacity .7s ease, visibility 0s linear 1.7s; } .page.on { visibility: visible; transition-delay: 0s; }
+.page.p5 { transition-duration: 2.4s; }   /* ฉาก 4 → 5 เฟดช้าลง */
+.page:not(.on) { visibility: hidden; transition: opacity 1.3s ease, visibility 0s linear 2.6s; } .page.on { visibility: visible; transition-delay: 0s; }
 .screen.last .skip, .screen.first .back { opacity: 0; pointer-events: none; }   /* ฉากแรกไม่มีปุ่มกลับ · ฉากสุดท้ายไม่มีข้ามบทเกริ่น */
 .layer, .art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
 .vid { object-fit: cover; background: #1d2a30; transition: opacity .25s; }   /* ฉาก 1–2 เป็นวิดีโอ */
@@ -64,8 +64,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .progress i.on::after { transform: none; }
 
 .copies { position: absolute; z-index: 5; left: calc(24 * var(--u)); right: calc(24 * var(--u)); top: calc(171 * var(--u)); pointer-events: none; }
-.copy { position: absolute; left: 0; top: 0; white-space: nowrap; color: #fff; font-weight: 500; font-size: calc(24 * var(--u)); line-height: calc(36 * var(--u)); opacity: 0; transform: translateY(calc(8 * var(--u))); transition: opacity .35s ease, transform .35s ease; }
-.copy.on { opacity: 1; transform: none; transition: opacity .9s ease var(--d, .4s), transform .9s ease var(--d, .4s); }
+.copy { position: absolute; left: 0; top: 0; white-space: nowrap; color: #fff; font-weight: 500; font-size: calc(24 * var(--u)); line-height: calc(36 * var(--u)); opacity: 0; transform: translateY(calc(8 * var(--u))); transition: opacity .6s ease, transform .6s ease; }
+.copy.on { opacity: 1; transform: none; transition: opacity 1.6s ease var(--d, .7s), transform 1.6s ease var(--d, .7s); }
 .copy.sm { font-size: calc(19.7 * var(--u)); }          /* หน้า 2 มี 3 บรรทัด ตัวเล็กลงตามดีไซน์ */
 .copy em { font-style: normal; color: var(--teal); }
 
