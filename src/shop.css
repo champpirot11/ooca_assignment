@@ -22,7 +22,7 @@
 .sf-masc:has(.sit) .sf-shadow { opacity: 0; }
 .sf-sit { position: absolute; left: 20px; top: 258px; width: 220px; max-width: none !important; opacity: 0; transition: opacity 1.2s ease; pointer-events: none; z-index: 1; } .sf-sit.on { opacity: 1; }
 .sf-body.sit, .sf-body.sit.speak { animation: none; }   /* ฉากแรกใช้ภาพจากดีไซน์ตรงๆ ไม่ขยับ */
-.sf-ghost { position: absolute; pointer-events: none; animation: dynout .45s ease forwards; }
+.sf-ghost, .sf-dyn.sf-ghost { position: absolute; pointer-events: none; animation: dynout .45s ease forwards; }   /* ต้องชนะ .sf-dyn (dynin) ไม่งั้นเงาเก่าจะหายวูบแล้วโผล่ใหม่ = กระพริบ */
 @keyframes dynout { to { opacity: 0; transform: translateY(-4px); } }
 .sf-body .svgp svg { display: block; width: 100%; height: auto; overflow: visible; }
 .sf-body .leg { transform-box: fill-box; transform-origin: 50% 8%; }
@@ -203,4 +203,4 @@
 @keyframes tapring { 50% { box-shadow: 0 0 0 calc(6 * var(--u)) rgba(0, 196, 179, .35); } }
 .sf-top { transition: opacity .6s ease, height .65s cubic-bezier(.4, 0, .2, 1), margin .65s cubic-bezier(.4, 0, .2, 1); } .sf-top.fadeout { opacity: 0; overflow: hidden; margin-bottom: calc(-12 * var(--u)); }   /* -12 = ช่องว่างระหว่างกล่อง */
 .sf-embed iframe { transition: height .65s cubic-bezier(.4, 0, .2, 1); }
-.sf-hint.nudge { animation: hnudge .45s ease; color: #E0655A; } @keyframes hnudge { 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+.sf-hint.nudge { animation: hnudge 1.4s ease; } @keyframes hnudge { 0% { color: #E0655A; } 6%, 18% { transform: translateX(-4px); } 12%, 24% { transform: translateX(4px); } 30% { transform: none; color: #E0655A; } 100% { color: inherit; } }   /* สั่น + แดงแป๊บเดียว แล้วค่อยๆ กลับเป็นสีเดิม */
