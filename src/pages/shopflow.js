@@ -313,8 +313,11 @@ export function createShopFlow({ onExit } = {}) {
     const topic = st.topics.length && !st.heavy ? TOPICS[st.topics[0]].label : null, heart = st.heavy ? 'แค่มาถึงตรงนี้ ก็พอแล้วนะ ไม่ต้องทำอะไรต่อก็ได้' : HEART[topic] || HEART._;
     const data = { when, mood, cover: COVER[st.mood], track: st.track.title, topic, heart, action: st.heavy ? null : ACTION(st.battery), heavy: st.heavy, logoUrl };
     say.hide(); pose('listen');
-    if (top.childElementCount && !REDUCE) { top.classList.add('fadeout'); await wait(600); }   // เครื่องเล่นแผ่นค่อยๆ เฟดหาย ไม่วาบหาย
-    top.innerHTML = ''; top.classList.remove('small', 'fadeout'); embed.classList.add('slim');
+    if (top.childElementCount && !REDUCE) {   // เครื่องเล่นแผ่นค่อยๆ เฟดหาย พร้อมยุบที่ว่างลงช้าๆ (เครื่องเล่นเพลงเลื่อนขึ้นไปแบบนุ่มๆ ไม่เด้ง)
+      top.style.height = top.offsetHeight + 'px'; void top.offsetHeight; top.classList.add('fadeout'); top.style.height = '0px'; embed.classList.add('slim');
+      const t0 = performance.now(); await new Promise((res) => { const f = () => { layout(0); performance.now() - t0 < 700 ? requestAnimationFrame(f) : res(); }; f(); });
+    }
+    top.innerHTML = ''; top.classList.remove('small', 'fadeout'); top.style.height = ''; embed.classList.add('slim');
     swapOut(); dyn.className = 'sf-dyn sf-rc'; dyn.innerHTML = `<div class="sf-rcw" id="rcw"><i class="slot"></i><div class="sf-paperr" id="rp"><img class="lg" src="${logoUrl}" alt="ooca"><b class="nm">ร้านแผ่นเสียง ooca - ฟังใจ</b><small>ที่หลบฝนสำหรับใจที่เหนื่อย</small>
       <div class="r sm"><span>${when}</span><span>#0001</span></div><hr><div class="r cv"><img src="${COVER[st.mood]}" alt=""><span>แผ่นเสียง · ${mood.th}<br>(${mood.en})<br><small>เพลง: ${esc(st.track.title)}</small></span><span>0.00</span></div><div class="r"><span>ที่นั่งหลบฝน (ไม่จำกัดเวลา)</span><span>0.00</span></div><div class="r"><span>คนฟังคุณเล่า</span><span>0.00</span></div><hr>
       <div class="r tot"><span>รวมทั้งหมด</span><span>0.00</span></div><div class="r"><span>ชำระด้วย: การเข้ามาหลบฝน</span></div><hr>

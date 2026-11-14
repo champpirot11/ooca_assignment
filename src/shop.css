@@ -201,4 +201,5 @@
 .sf.compact .sf-mean > small { display: none; }
 .sf-embed.tap { box-shadow: 0 0 0 calc(3 * var(--u)) #00C4B3; animation: tapring 1.6s ease-in-out infinite; }
 @keyframes tapring { 50% { box-shadow: 0 0 0 calc(6 * var(--u)) rgba(0, 196, 179, .35); } }
-.sf-top { transition: opacity .6s ease; } .sf-top.fadeout { opacity: 0; }
+.sf-top { transition: opacity .6s ease, height .65s cubic-bezier(.4, 0, .2, 1), margin .65s cubic-bezier(.4, 0, .2, 1); } .sf-top.fadeout { opacity: 0; overflow: hidden; margin-bottom: calc(-12 * var(--u)); }   /* -12 = ช่องว่างระหว่างกล่อง */
+.sf-embed iframe { transition: height .65s cubic-bezier(.4, 0, .2, 1); }
