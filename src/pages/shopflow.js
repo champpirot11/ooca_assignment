@@ -249,7 +249,9 @@ export function createShopFlow({ onExit } = {}) {
     dyn.querySelector('#opts').onclick = (e) => {
       const b = e.target.closest('.sf-opt'); if (!b || my !== run) return; const i = +b.dataset.i;
       if (st.songs.includes(i)) st.songs = st.songs.filter((x) => x !== i);
-      else { if (st.songs.length >= 2) { const old = st.songs.shift(); const ob = dyn.querySelector(`.sf-opt[data-i="${old}"]`); ob.setAttribute('aria-pressed', 'false'); ob.setAttribute('aria-checked', 'false'); } st.songs.push(i); audio.vibe(i); say(SONGS[i].say); }
+      else { if (st.songs.length >= 2) {   // ครบ 2 ข้อแล้ว → ต้องเอาอันเดิมออกก่อน (ไม่สลับให้เงียบๆ)
+        const hn = dyn.querySelector('#hint'); if (hn) { hn.classList.remove('nudge'); void hn.offsetWidth; hn.classList.add('nudge'); } audio.fx('type'); say('เลือกได้ 2 ข้อนะครับ\nแตะอันเดิมเพื่อเอาออกก่อน'); return; }
+        st.songs.push(i); audio.vibe(i); say(SONGS[i].say); }
       b.setAttribute('aria-pressed', String(st.songs.includes(i))); b.setAttribute('aria-checked', String(st.songs.includes(i))); const hn = dyn.querySelector('#hint'); if (hn) hn.textContent = `เลือกได้ 2 ข้อ · เลือกแล้ว ${st.songs.length}/2`; pose(st.songs.length ? 'listen' : 'stand'); if (st.songs.includes(i)) hop(); setBtn('ไปต่อ 4/5', st.songs.length > 0);
     };
     const res = await press(); audio.duck(1); if (res === 'skip') st.songs = []; return res;
