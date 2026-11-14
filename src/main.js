@@ -88,7 +88,7 @@ hp.innerHTML = `<div class="hp-ic"><svg aria-hidden="true" viewBox="0 0 45 45" f
   <b>เปิดเสียง หรือใส่หูฟังไว้จะดีที่สุด</b><p>ใช้เวลาประมาณ 5–10 นาที<br>ข้อมูลทุกอย่างอยู่ในเครื่องคุณเท่านั้น ไม่ถูกส่งไปไหน</p><small>แตะเพื่อไปต่อ</small>`;
 screenEl.appendChild(hp);
 hp.addEventListener('click', (e) => { e.stopPropagation(); if (!hp.classList.contains('on')) return; audio.unlock(); hp.classList.remove('on'); screenEl.classList.remove('notice'); resetPrologue(); go(0); });
-screenEl.appendChild(home.el); home.mount();
+screenEl.appendChild(home.el); home.mount(); screenEl.style.visibility = 'visible'; document.documentElement.classList.remove('boot'); requestAnimationFrame(() => requestAnimationFrame(() => home.el.classList.remove('instant')));
 // หน้าแรก: แตะตรงไหนก็ได้ครั้งแรก = เปิดเสียงฝนข้างนอก + เพลงในร้าน (เบราว์เซอร์ไม่ให้เล่นเสียงก่อนแตะ)
 home.el.addEventListener('pointerdown', () => { if (entering || !home.on) return; audio.unlock(); if (!home.heard) { home.heard = true; audio.scene('home'); } }, { capture: true });
 const startHome = !(param('step', 0) || param('talk', 0) || param('song', 0)); if (!startHome) home.hide();

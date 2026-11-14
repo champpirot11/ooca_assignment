@@ -27,6 +27,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .page:not(.on) { visibility: hidden; transition: opacity .7s ease, visibility 0s linear 1.7s; } .page.on { visibility: visible; transition-delay: 0s; }
 .screen.last .skip, .screen.first .back { opacity: 0; pointer-events: none; }   /* ฉากแรกไม่มีปุ่มกลับ · ฉากสุดท้ายไม่มีข้ามบทเกริ่น */
 .layer, .art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.vid { object-fit: cover; background: #1d2a30; transition: opacity .25s; }   /* ฉาก 1–2 เป็นวิดีโอ */
 .art svg { width: 100%; height: 100%; display: block; }
 .shopimg { object-fit: cover; }
 

@@ -11,7 +11,7 @@ const TIPS = [33, 33, 376, 376, 352], GROUND = 432;   // หยดเฉพา�
 
 export function createHome({ onEnter }) {
   const el = document.createElement('section');
-  el.className = 'home on'; el.setAttribute('aria-label', 'หน้าแรก ooca ร้านแผ่นเสียงฟังใจ');
+  el.className = 'home on instant';   // เปิดเว็บมา หน้าแรกขึ้นทันที ไม่เฟด (ไม่ให้เห็นฉากข้างหลังแว้บ) el.setAttribute('aria-label', 'หน้าแรก ooca ร้านแผ่นเสียงฟังใจ');
   el.innerHTML = `<canvas class="hm-rain" aria-hidden="true"></canvas><div class="hm-stage">
       <div class="hm-art" role="img" aria-label="ooca ก้อนเมฆถือร่ม เว้นที่ว่างใต้ร่มไว้ให้คุณ">${umbrella}</div>
       <div class="hm-logo" role="img" aria-label="ooca">${logo}</div>
