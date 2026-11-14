@@ -30,8 +30,8 @@
 @keyframes leg { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
 .sf-body .arm { transform-box: fill-box; } .sf-body .arm-r { transform-origin: 10% 8%; } .sf-body .arm-l { transform-origin: 90% 6%; }   /* แขนแกว่งสลับกับขา */
 .sf-body.walking .arm-r { animation: armr 1.4s ease-in-out infinite; } .sf-body.walking .arm-l { animation: arml 1.4s ease-in-out infinite; }
-@keyframes armr { 0%, 100% { transform: translateY(-6px) rotate(-10deg); } 50% { transform: translateY(3px) rotate(2deg); } }   /* ขวายก ↔ ซ้ายห้อย สลับกันแบบแกว่งหน้า-หลัง */
-@keyframes arml { 0%, 100% { transform: translateY(3px) rotate(-2deg); } 50% { transform: translateY(-6px) rotate(10deg); } }
+@keyframes armr { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(6deg); } }   /* หันเฉียงไปขวา: ขวาแกว่งไปหน้า (ไปทางขวา) ตอนซ้ายแกว่งไปหลัง (ไปทางซ้าย) มือสองข้างสวนทางกันเสมอ */
+@keyframes arml { 0%, 100% { transform: rotate(16deg); } 50% { transform: rotate(-8deg); } }
 .sf-body.speak { animation: mtalk2 1.4s ease-in-out infinite; }
 .sf-body.walking { animation: mwalk 1.4s ease-in-out infinite; }
 .sf-masc.hop { animation: mhop .85s cubic-bezier(.35, 1.25, .5, 1); }
