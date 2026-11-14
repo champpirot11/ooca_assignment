@@ -30,8 +30,8 @@
 @keyframes leg { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
 .sf-body .arm { transform-box: fill-box; } .sf-body .arm-r { transform-origin: 10% 8%; } .sf-body .arm-l { transform-origin: 90% 6%; }   /* แขนแกว่งสลับกับขา */
 .sf-body.walking .arm-r { animation: armr 1.4s ease-in-out infinite; } .sf-body.walking .arm-l { animation: arml 1.4s ease-in-out infinite; }
-@keyframes armr { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(0deg); } }
-@keyframes arml { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(14deg); } }
+@keyframes armr { 0%, 100% { transform: rotate(-18deg); } 50% { transform: rotate(8deg); } }   /* ขวากางออก ↔ แนบตัว */
+@keyframes arml { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(18deg); } }   /* ซ้ายสลับกับขวา: ขวากาง = ซ้ายแนบ */
 .sf-body.speak { animation: mtalk2 1.4s ease-in-out infinite; }
 .sf-body.walking { animation: mwalk 1.4s ease-in-out infinite; }
 .sf-masc.hop { animation: mhop .85s cubic-bezier(.35, 1.25, .5, 1); }
@@ -191,7 +191,8 @@
 .sf-hint.warn { color: #C0563F; }
 
 /* จอเตี้ย (สูงน้อยกว่า ~800 หน่วยดีไซน์): หน้าเล่นเพลงแบบกะทัดรัด ให้กล่องขาวไม่บังตัว ooca */
-.sf.compact .sf-top.small { display: none; }
+.sf.compact .sf-top.small .sf-tt { width: 36%; }   /* ค่อยๆ ย่อเครื่องเล่น ไม่หายวูบ */
+.sf-tt { transition: width .8s ease; }
 .sf.compact .sf-embed iframe { height: calc(84 * var(--u)); }
 .sf.compact .sf-mean { padding: calc(10 * var(--u)) calc(14 * var(--u)); }
 .sf.compact .sf-cv { padding-bottom: calc(6 * var(--u)); margin-bottom: calc(6 * var(--u)); gap: calc(10 * var(--u)); }

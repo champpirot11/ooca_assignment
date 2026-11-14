@@ -283,7 +283,8 @@ export function createShopFlow({ onExit } = {}) {
   let widget = null, playing = false, wReady = false, wWant = false, needleDown = false;
   // เริ่มเพลงทันทีตอนผู้ใช้แตะ (ยังนับเป็นการแตะของผู้ใช้ เบราว์เซอร์จึงยอมให้เล่น) เปิดเบาไว้ก่อนแล้วค่อยดังขึ้นตอนเข็มวางลงแผ่น
   function startSong() { if (!widget || !wReady) { wWant = true; return; } try { widget.setVolume(needleDown ? 100 : 0); widget.play(); } catch (e) {} }
-  function setPlaying(on) { playing = on; el.classList.toggle('playing', on); if (on) spawnNotes(); if (alive) audio.room(on ? .12 : .45, on ? 1000 : 1500); }   // ตอนเพลงเล่น ฝนเบาลงเหลือแค่บรรยากาศ
+  function setPlaying(on) { playing = on; const show = on && needleDown; el.classList.toggle('playing', show); if (show) spawnNotes();   // ท่าทาง/โน้ตลอย เริ่มหลังเข็มวางลงแผ่น (ไม่ให้ทับแอนิเมชันเข็มเลื่อน)
+    if (alive) audio.room(on ? .12 : .45, on ? 1000 : 1500); }   // ตอนเพลงเล่น ฝนเบาลงเหลือแค่บรรยากาศ
   function spawnNotes() { const box = $('#notes'); if (box.dataset.on) return; box.dataset.on = 1; const iv = setInterval(() => { if (!alive) { clearInterval(iv); delete box.dataset.on; return; } if (!playing) return; const n = document.createElement('span'); n.textContent = ['♪', '♫', '♩'][Math.random() * 3 | 0]; n.style.cssText = `left:${840 + Math.random() * 90}px;top:${225 + Math.random() * 20}px;--dx:${(Math.random() * 120 - 40) | 0}px;color:${['#00C4B3', '#F0655B', '#F6B73C', '#5B4DB5'][Math.random() * 4 | 0]}`; box.appendChild(n); setTimeout(() => n.remove(), 3600); }, 700); }
   function mountEmbed() {
     if (embed.firstChild?.getAttribute('src') === st.track.embed) return; widget = null; wReady = false; wWant = false; needleDown = false; embed.classList.remove('tap'); embed.innerHTML = `<iframe title="เครื่องเล่นเพลง SoundCloud" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="${st.track.embed}"></iframe>`;
@@ -296,7 +297,7 @@ export function createShopFlow({ onExit } = {}) {
     top.innerHTML = `<div class="sf-ttw">${TT}</div>`; setSheet({ cls: 'sf-player', btn: '' });
     await say('เขาว่ากันว่าเสียงเพลง\nช่วยปลดปล่อยความรู้สึกของเราได้นะ'); setBtn('ฟังเพลง'); await press();
     startSong(); setBtn(''); el.classList.add('needle'); await wait(1700); audio.fx('needle'); await wait(600);
-    needleDown = true; audio.music(false); pose('listen'); hop(); cam.boost = 1; if (widget && wReady) fadeWidget(100, 1600);
+    needleDown = true; if (playing) setPlaying(true); audio.music(false); pose('listen'); hop(); cam.boost = 1; if (widget && wReady) fadeWidget(100, 1600);
     embed.hidden = false; top.classList.add('small');
     const myP = run; setTimeout(() => { if (myP !== run || playing || !dyn.classList.contains('sf-player')) return;   // เบราว์เซอร์ไม่ยอมเล่นเอง (เช่น iPhone บางรุ่น) → บอกให้แตะปุ่มเล่นในเครื่องเล่น
       embed.classList.add('tap'); say('แตะปุ่ม ▶ ในเครื่องเล่น\nเพื่อเริ่มเพลงได้เลยนะครับ'); try { widget?.setVolume(100); } catch (e) {} }, 2600);
