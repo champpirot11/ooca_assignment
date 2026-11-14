@@ -63,23 +63,23 @@ const SC = (path) => `https://w.soundcloud.com/player/?url=${encodeURIComponent(
 export const TRACKS = {
   release: [
     { title: 'Shake It Out - Florence + The Machine (cover: CARRON)', embed: SC('carronmusic/shake-it-out'), meaning: 'บางวันเราแบกอะไรไว้เยอะจนลืมไปว่าวางลงได้ ลองสลัดมันออกสักหน่อย แล้วค่อยเริ่มใหม่' },
-    { title: 'Your Hand In Mine - Explosions In the Sky (cover: Off by Two)', embed: SC('offbytwo/your-hand-in-mine-explosions'), meaning: 'ไม่ต้องมีคำพูดก็ได้ ปล่อยให้เสียงดนตรีพาความอัดอั้นออกไป แล้วค่อยๆ เบาลงไปพร้อมกัน' },
+    { title: 'Unsteady - X Ambassadors (cover: John Allred)', embed: SC('johnallred/x-ambassadors-unsteady-cover-by-allred'), meaning: 'ใจที่โยกเยกไม่ได้แปลว่าอ่อนแอ บอกออกมาว่าไม่ไหวได้ แล้วหาอะไรสักอย่างไว้ยึดก่อนก็พอ' },
   ],
   cathartic: [
     { title: 'All I Want - Kodaline (cover: Chris Lanzon)', embed: SC('chrislanzonmusic/alliwant'), meaning: 'การคิดถึงใครสักคนจนเจ็บ แปลว่าใจเราเคยรักจริง ร้องไห้ออกมาได้นะ' },
     { title: 'Skinny Love - Bon Iver (cover: Georgia Kinahan)', embed: SC('georgiakinahan/skinny-love-bon-iver-birdy'), meaning: 'ความเศร้าบางอย่างไม่ต้องรีบหาย ปล่อยให้มันอยู่สักพัก แล้วมันจะเบาลงเอง' },
   ],
   nostalgia: [
-    { title: 'Somewhere Only We Know - Keane (cover: Simply Three)', embed: SC('simplythree/somewhere-only-we-know-keane'), meaning: 'ที่ที่เคยอบอุ่นยังอยู่ในใจเราเสมอ กลับไปคิดถึงได้ทุกเมื่อที่เหนื่อย' },
+    { title: 'The Night We Met - Lord Huron (cover: Sammi Lee)', embed: SC('lee_sam_t/the-night-we-met'), meaning: 'การอยากย้อนกลับไปช่วงเวลาหนึ่ง แปลว่ามันเคยมีความหมายกับเรามาก คิดถึงได้ ไม่ผิดเลย' },
     { title: 'Yellow - Coldplay (cover: Archelle)', embed: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A478672074&color=%2300c4b3&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false', meaning: 'มีใครบางคนมองเห็นแสงในตัวคุณเสมอ แม้ในวันที่คุณมองไม่เห็นมันเอง' },
   ],
   intro: [
-    { title: 'Holocene - Bon Iver (instrumental cover: rakaaart)', embed: SC('rakaaart/holocene'), meaning: 'บางครั้งการรู้สึกตัวเล็กๆ ก็ทำให้เรื่องในหัวเบาลง เราไม่จำเป็นต้องคิดให้จบทุกเรื่องในคืนนี้' },
+    { title: 'Holocene - Bon Iver', embed: SC('boniver/holocene'), meaning: 'บางครั้งการรู้สึกตัวเล็กๆ ก็ทำให้เรื่องในหัวเบาลง เราไม่จำเป็นต้องคิดให้จบทุกเรื่องในคืนนี้' },
     { title: 'Anchor - Novo Amor (cover: eriohutomo)', embed: SC('eriohutomo/anchor-novo-amor-cover'), meaning: 'ในวันที่ความคิดพัดไปมา หาอะไรสักอย่างไว้ยึด แค่ลมหายใจตัวเองก็ได้' },
   ],
   still: [
-    { title: 'Nuvole Bianche - Ludovico Einaudi (piano: Andrea Bernacca)', embed: SC('andrea-bernacca/ludovico-einaudi-nuvole'), meaning: 'ไม่ต้องคิด ไม่ต้องพูด ปล่อยให้เปียโนเล่นไป เหมือนมองเมฆค่อยๆ ลอยผ่าน' },
-    { title: 'saman - Ólafur Arnalds (harp: Abigail Brower)', embed: SC('abrowerharpist/saman-by-olafur-arnalds'), meaning: 'ความเงียบก็เป็นที่พักได้ อยู่ตรงนี้เฉยๆ สักพักก็พอ' },
+    { title: 'Bloom - The Paper Kites', embed: SC('nettwerkmusicgroup/the-paper-kites-bloom-bonus'), meaning: 'ความรู้สึกดีๆ ค่อยๆ ผลิบานอย่างเงียบๆ ได้ ไม่ต้องรีบ ไม่ต้องดังก็ได้' },
+    { title: 'Such Great Heights - Iron & Wine', embed: SC('ironandwine/such-great-heights'), meaning: 'ไม่ต้องพูดอะไรก็ได้ แค่นึกถึงคนหรือที่ที่ทำให้ใจอุ่น แล้วนั่งฟังไปเงียบๆ' },
   ],
   calm: [
     { title: 'Banana Pancakes - Jack Johnson (cover: Nick Duke)', embed: SC('nickdukemusic/banana-pancakes-jack-johnson-cover'), meaning: 'วันฝนตกก็ไม่ต้องรีบไปไหน อยู่ช้าๆ ทำอะไรง่ายๆ ให้ตัวเองบ้าง' },
